@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm audit *)",
+      "Bash(npm run *)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"SERVER_TSC_EXIT=$?\")",
+      "Bash(echo \"CLIENT_TSC_EXIT=$?\")",
+      "Bash(npm view *)",
+      "Bash(npx oxlint *)",
+      "Bash(npx prisma *)",
+      "Bash(node _inspect_migrations.cjs)",
+      "Bash(node _verify_objects.cjs)",
+      "Bash(node_modules/.bin/tsc -b)",
+      "Bash(echo \"TSC_EXIT: $?\")",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(echo \"SERVER_TSC_EXIT: $?\")",
+      "Bash(echo \"CLIENT_TSC_EXIT: $?\")"
+    ]
+  }
+}
