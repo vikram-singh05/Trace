@@ -1,4 +1,4 @@
-# CampusFind 🎒
+# Trace 🎒
 
 A secure, full-stack campus lost-and-found platform built for the university community.
 
