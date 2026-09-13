@@ -1,0 +1,334 @@
+// ─────────────────────────────────────────────────────────────────
+//  CampusFind — Prisma Schema
+//  Source of truth for the PostgreSQL database.
+//
+//  To apply changes:
+//    npx prisma migrate dev --name <describe-your-change>
+//
+//  To view data:
+//    npx prisma studio
+// ─────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // DATABASE_URL — pgBouncer (Transaction mode). Required for Supabase.
+  url       = env("DATABASE_URL")
+  // DIRECT_URL  — Direct connection. Required for Prisma Migrate.
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  ENUMS
+// ─────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum ItemType {
+  LOST
+  FOUND
+}
+
+enum ItemStatus {
+  ACTIVE          // Visible; open for matches and claims
+  PENDING_REVIEW  // Flagged by user or system; awaiting admin action
+  RESOLVED        // Item successfully returned to owner
+  ARCHIVED        // Closed without resolution
+}
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  MATCH_FOUND
+  CLAIM_FILED
+  CLAIM_APPROVED
+  CLAIM_REJECTED
+  ITEM_RESOLVED
+  ITEM_MODERATED  // Admin removed or flagged the item
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  MODELS
+// ─────────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  studentId    String?   @unique              // University student ID
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         UserRole  @default(STUDENT)
+  university   String    @default("")         // e.g. "VIT Chennai"
+  phone        String?
+  avatarUrl    String?                        // ImageKit image URL
+  isActive     Boolean   @default(true)       // false = banned
+  isVerified   Boolean   @default(false)      // Email OTP verification
+  otpCode      String?                        // 6-digit OTP
+  otpExpiresAt DateTime?                      // OTP expiration time
+  otpAttempts  Int       @default(0)          // Failed OTP attempts; locked at 5
+  deletedAt    DateTime?                      // Soft delete — admin action
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  items         Item[]
+  claims        Claim[]
+  notifications Notification[]
+  messages      Message[]
+  reportsSubmitted UserReport[] @relation("ReportedBy")
+  reportsReceived  UserReport[] @relation("ReportedUser")
+
+  @@map("users")
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique                         // e.g. "Electronics", "Bags & Wallets"
+  icon String @default("📦")                 // Emoji icon for UI
+
+  // Relations
+  items Item[]
+
+  @@map("categories")
+}
+
+model Item {
+  id           String     @id @default(cuid())
+  type         ItemType
+  status       ItemStatus @default(ACTIVE)
+  title        String
+  description  String
+  color        String?                        // e.g. "dark blue", "black and red"
+  brand        String?                        // e.g. "Apple", "Wildcraft"
+  location     String                         // Where the item was lost/found
+  dateOccurred DateTime                       // When the loss/find occurred
+  imageUrls    String[]   @default([])        // ImageKit public URLs
+  tags         String[]   @default([])        // Keywords used for matching
+  deletedAt    DateTime?                      // Soft delete — admin moderation
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Foreign keys
+  reporterId String
+  categoryId String
+
+  // Relations
+  reporter              User                   @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  category              Category               @relation(fields: [categoryId], references: [id])
+  claims                Claim[]
+  verificationQuestions VerificationQuestion[]
+  lostMatches           Match[]                @relation("LostItem")
+  foundMatches          Match[]                @relation("FoundItem")
+
+  // Indexes — covering the most common API query patterns
+  @@index([reporterId])           // "My reports" dashboard
+  @@index([type, status])         // Browse + filter (most frequent query)
+  @@index([categoryId])           // Filter by category
+  @@index([deletedAt])            // Soft delete filter on every public query
+  @@index([dateOccurred])         // Sort by date
+  @@map("items")
+}
+
+/// Secret questions set by the finder of a FOUND item.
+///
+/// There is no "correct answer" stored on this model — the finder only
+/// writes the question. When a claimant submits a claim, their free-text
+/// answer (see ClaimAnswer) is shown to the finder, who manually reviews
+/// it and decides whether to approve or reject the claim.
+model VerificationQuestion {
+  id           String   @id @default(cuid())
+  question     String                         // e.g. "What is inside the main zip?"
+  displayOrder Int      @default(1)           // Ordering: 1, 2, 3
+  createdAt    DateTime @default(now())
+
+  // Foreign key
+  itemId String
+
+  // Relations
+  item    Item          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  answers ClaimAnswer[]
+
+  @@index([itemId])
+  @@map("verification_questions")
+}
+
+model Claim {
+  id             String      @id @default(cuid())
+  status         ClaimStatus @default(PENDING)
+  proofText      String                        // Claimant's written ownership description
+  proofImageUrls String[]    @default([])      // Optional supporting images
+  resolvedAt     DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Foreign keys
+  itemId     String
+  claimantId String
+
+  // Relations
+  item         Item          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  claimant     User          @relation(fields: [claimantId], references: [id], onDelete: Cascade)
+  answers      ClaimAnswer[]
+  conversation Conversation?
+
+  // A user may re-submit a claim after a previous one is REJECTED, so there is
+  // no DB-level uniqueness on (itemId, claimantId). "At most one PENDING claim
+  // per user per item" is enforced in application code (see claim.service.ts).
+  @@index([itemId, claimantId])   // Fast lookup of a user's existing claims on an item
+  @@index([claimantId])           // "My claims" dashboard
+  @@index([itemId])               // "All claims for this item" (item owner / admin)
+  @@map("claims")
+}
+
+/// Stores the claimant's answers to each verification question.
+///
+/// `answer` is stored in plain text because the item owner/admin
+/// needs to read it during manual review — there is no automated
+/// pass/fail check.
+model ClaimAnswer {
+  id        String   @id @default(cuid())
+  answer    String                           // Plain text from claimant
+
+  // Foreign keys
+  claimId    String
+  questionId String
+
+  // Relations
+  claim    Claim                @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  question VerificationQuestion @relation(fields: [questionId], references: [id])
+
+  // One answer per question per claim
+  @@unique([claimId, questionId])
+  @@map("claim_answers")
+}
+
+model Match {
+  id         String   @id @default(cuid())
+  score      Float                          // Confidence: 0.0 – 1.0
+  reasons    String[] @default([])          // e.g. ["same category", "keyword: AirPods"]
+  isReviewed Boolean  @default(false)       // User dismissed or confirmed this match
+  createdAt  DateTime @default(now())
+
+  // Foreign keys
+  lostItemId  String
+  foundItemId String
+
+  // Relations
+  lostItem  Item @relation("LostItem",  fields: [lostItemId],  references: [id], onDelete: Cascade)
+  foundItem Item @relation("FoundItem", fields: [foundItemId], references: [id], onDelete: Cascade)
+
+  // No duplicate match pairs
+  @@unique([lostItemId, foundItemId])
+  @@index([lostItemId])
+  @@index([foundItemId])
+  @@map("matches")
+}
+
+model Notification {
+  id            String           @id @default(cuid())
+  type          NotificationType
+  message       String
+  isRead        Boolean          @default(false)
+  emailSent     Boolean          @default(false)  // Prevent duplicate email sends
+  relatedItemId String?                            // Optional: for deep-link navigation
+  createdAt     DateTime         @default(now())
+
+  // Foreign key
+  userId String
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])       // Unread count badge query
+  @@index([userId, createdAt])    // Notification list (sorted newest first)
+  @@map("notifications")
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  CHAT SYSTEM (Linked to Approved Claims)
+// ─────────────────────────────────────────────────────────────────
+
+model Conversation {
+  id        String   @id @default(cuid())
+  claimId   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Per-user "delete chat". Stamping a side hides the thread from that user's
+  // inbox only; the other participant keeps the full history. Deleting never
+  // destroys the other party's copy. If a newer message arrives, the thread
+  // resurfaces for the user who cleared it (see chat.controller.ts).
+  reporterDeletedAt DateTime?     // Hidden from the item reporter's inbox
+  claimantDeletedAt DateTime?     // Hidden from the claimant's inbox
+
+  // Relations
+  claim    Claim        @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  messages Message[]
+  reports  UserReport[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // Relations
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  MODERATION & REPORTING
+// ─────────────────────────────────────────────────────────────────
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+}
+
+enum ReportType {
+  CHAT_ABUSE
+  SCAM
+  INAPPROPRIATE_BEHAVIOR
+  OTHER
+}
+
+model UserReport {
+  id             String       @id @default(cuid())
+  type           ReportType
+  reason         String
+  status         ReportStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  reporterId     String
+  reportedId     String
+  conversationId String?
+
+  reporter       User          @relation("ReportedBy", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser   User          @relation("ReportedUser", fields: [reportedId], references: [id], onDelete: Cascade)
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([reportedId])
+  @@map("user_reports")
+}
