@@ -30,6 +30,13 @@ export interface LoginInput {
   password: string;
 }
 
+export interface ResetPasswordInput {
+  email: string;
+  otp: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export interface ApiSuccess<T> {
   success: true;
   data: T;

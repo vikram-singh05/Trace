@@ -35,6 +35,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSuspended, setIsSuspended] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -48,7 +49,17 @@ export default function Login() {
       await login({ email, password });
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err?.error?.message || 'Invalid email or password');
+      if (err?.error?.code === 'ACCOUNT_SUSPENDED' || err?.error?.code === 'ACCOUNT_DEACTIVATED') {
+        setIsSuspended(true);
+      } else {
+        setIsSuspended(false);
+      }
+
+      if (err?.error?.details?.length > 0) {
+        setError(err.error.details[0].message);
+      } else {
+        setError(err?.error?.message || 'Invalid email or password');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +137,14 @@ export default function Login() {
                 className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm font-bold flex items-start gap-3"
               >
                 <span className="mt-0.5">⚠️</span>
-                <span>{error}</span>
+                <span>
+                  {error}{' '}
+                  {isSuspended && (
+                    <Link to="/support" className="underline hover:text-red-500 dark:hover:text-red-300 ml-1">
+                      Contact support here.
+                    </Link>
+                  )}
+                </span>
               </motion.div>
             )}
 
@@ -173,9 +191,9 @@ export default function Login() {
               </motion.div>
 
               <motion.div variants={itemVariants} className="flex items-center justify-end">
-                <a href="#" className="text-sm font-bold text-gold-600 dark:text-gold-400 hover:text-gold-500 transition-colors">
+                <Link to="/forgot-password" className="text-sm font-bold text-gold-600 dark:text-gold-400 hover:text-gold-500 transition-colors">
                   Forgot password?
-                </a>
+                </Link>
               </motion.div>
 
               <motion.button

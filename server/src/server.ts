@@ -127,12 +127,33 @@ io.on('connection', (socket) => {
   });
 });
 
+// ── Supabase Keep-Alive ───────────────────────────────────────────
+// Ping the database every 6 hours to prevent Supabase free-tier
+// auto-pause (triggers after ~7 days of inactivity). A lightweight
+// SELECT 1 is enough — only ~4 queries/day.
+const KEEP_ALIVE_MS = 6 * 60 * 60 * 1000; // 6 hours
+let keepAliveInterval: NodeJS.Timeout | null = null;
+
+const startKeepAlive = () => {
+  keepAliveInterval = setInterval(async () => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      console.log('💓 DB keep-alive ping OK');
+    } catch (err) {
+      console.error('💔 DB keep-alive ping failed:', err);
+    }
+  }, KEEP_ALIVE_MS);
+};
+
 // ── Start Server ──────────────────────────────────────────────────
 const start = async () => {
   try {
     // Verify database connection before accepting traffic
     await prisma.$connect();
     console.log('✅ Database connected');
+
+    startKeepAlive();
+    console.log('💓 DB keep-alive scheduled (every 6h)');
 
     httpServer.listen(env.PORT, () => {
       console.log(`🚀 Server running on http://localhost:${env.PORT}`);
@@ -147,16 +168,14 @@ const start = async () => {
 
 // ── Graceful Shutdown ─────────────────────────────────────────────
 // Close DB connections cleanly on CTRL+C or process termination
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
+const shutdown = async (signal: string) => {
+  console.log(`${signal} received. Shutting down gracefully...`);
+  if (keepAliveInterval) clearInterval(keepAliveInterval);
   await prisma.$disconnect();
   process.exit(0);
-});
+};
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT received. Shutting down gracefully...');
-  await prisma.$disconnect();
-  process.exit(0);
-});
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 start();

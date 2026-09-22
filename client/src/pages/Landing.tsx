@@ -20,13 +20,30 @@ import {
   Shield
 } from 'lucide-react';
 
+const StunningBackground = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+    {/* Ultra-lightweight subtle grid */}
+    <div className="absolute inset-0 opacity-[0.03]" style={{ 
+      backgroundImage: `linear-gradient(rgba(255, 255, 255, 1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 1) 1px, transparent 1px)`,
+      backgroundSize: '40px 40px',
+      maskImage: 'radial-gradient(ellipse at 50% 0%, black 20%, transparent 80%)',
+      WebkitMaskImage: 'radial-gradient(ellipse at 50% 0%, black 20%, transparent 80%)'
+    }} />
+    
+    {/* GPU-accelerated static and CSS-pulsed glows instead of JS-driven framer motion arrays */}
+    <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#A09435] opacity-20 blur-[120px] animate-pulse-glow" />
+    <div className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#6B7C3E] opacity-10 blur-[120px]" />
+    <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[40%] rounded-full bg-[#B5A642] opacity-[0.15] blur-[140px]" />
+  </div>
+);
+
 export default function Landing() {
   const [simulationState, setSimulationState] = useState<'idle' | 'scanning' | 'matched'>('idle');
   const { scrollYProgress } = useScroll();
   
-  // Parallax values
-  const yBg1 = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const yBg2 = useTransform(scrollYProgress, [0, 1], ['0%', '-50%']);
+  // Parallax values - Subtler for smoother visual flow
+  const yText = useTransform(scrollYProgress, [0, 1], ['0%', '-15%']);
+  const yWidget = useTransform(scrollYProgress, [0, 1], ['0%', '10%']);
   
   const runSimulation = () => {
     setSimulationState('scanning');
@@ -104,26 +121,24 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen relative bg-black selection:bg-gold-500/30 overflow-hidden">
-      <div className="premium-bg opacity-40" />
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-500 to-amber-500 origin-left z-50 shadow-[0_0_10px_rgba(212,175,55,0.3)]"
+        style={{ scaleX: scrollYProgress }}
+      />
+      <div className="premium-bg opacity-30" />
 
       {/* ═══════════════════════════════════════
           NEW HERO SECTION (Framer Motion)
          ═══════════════════════════════════════ */}
       <section className="relative min-h-[95vh] flex flex-col justify-center pt-24 pb-16">
-        {/* Parallax Glow Effects */}
-        <motion.div 
-          style={{ y: yBg1 }}
-          className="absolute top-[10%] left-[15%] w-[600px] h-[600px] bg-gold-500/10 rounded-full blur-[130px] pointer-events-none" 
-        />
-        <motion.div 
-          style={{ y: yBg2 }}
-          className="absolute bottom-[-10%] right-[10%] w-[700px] h-[700px] bg-amber-600/10 rounded-full blur-[150px] pointer-events-none" 
-        />
+        {/* Stunning Visual Background Effect */}
+        <StunningBackground />
 
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 w-full relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
           
           {/* Left Text Content */}
           <motion.div 
+            style={{ y: yText }}
             className="flex-1 text-center lg:text-left mt-10 lg:mt-0"
             variants={containerVariants}
             initial="hidden"
@@ -146,13 +161,13 @@ export default function Landing() {
             <motion.h1 variants={itemVariants} className="text-6xl sm:text-7xl lg:text-[5.5rem] font-black tracking-tight leading-[1.05] text-white">
               Find what you<br />
               lost.<br />
-              <span className="text-gold-500 relative inline-block">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] via-[#FEF08A] to-[#A09435] relative inline-block drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]">
                 Instantly.
                 <motion.span 
                   initial={{ width: 0 }}
                   animate={{ width: "100%" }}
                   transition={{ delay: 1, duration: 0.8, ease: "circOut" }}
-                  className="absolute bottom-2 left-0 h-2 bg-gold-500/30 -z-10 rounded-full"
+                  className="absolute bottom-2 left-0 h-2 bg-[#D4AF37]/30 -z-10 rounded-full"
                 />
               </span>
             </motion.h1>
@@ -166,9 +181,10 @@ export default function Landing() {
                 <motion.div
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="bg-gold-500 text-black font-extrabold px-8 py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(234,179,8,0.2)]"
+                  className="relative group bg-gradient-to-r from-[#B5A642] to-[#8A7E2A] text-black font-extrabold px-8 py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(181,166,66,0.3)] overflow-hidden"
                 >
-                  Join the Network <ArrowRight className="w-5 h-5" />
+                  <span className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-500 -translate-x-full skew-x-12 pointer-events-none" />
+                  <span className="relative flex items-center gap-2">Join the Network <ArrowRight className="w-5 h-5" /></span>
                 </motion.div>
               </Link>
               <Link to="/items" className="w-full sm:w-auto block">
@@ -194,14 +210,15 @@ export default function Landing() {
 
           {/* Right Interactive Widget */}
           <motion.div 
-            initial={{ opacity: 0, x: 40, rotateY: -10 }}
+            style={{ y: yWidget }}
+            initial={{ opacity: 0, x: 40, rotateY: -5 }}
             animate={{ opacity: 1, x: 0, rotateY: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, type: "spring", stiffness: 100 }}
+            transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 100 }}
             className="flex-1 w-full max-w-lg lg:max-w-xl perspective-1000"
           >
             <motion.div 
-              whileHover={{ rotateY: -5, rotateX: 5 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              whileHover={{ rotateY: -3, rotateX: 3, scale: 1.01 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
               className="relative group"
             >
               {/* Animated Glow Behind Widget */}
@@ -446,30 +463,37 @@ export default function Landing() {
               <motion.div
                 key={feature.title}
                 variants={featureItemVariants}
-                whileHover={{ y: -5, borderColor: "rgba(255,255,255,0.15)" }}
-                className={`${feature.size === 'large'
+                whileHover={{ 
+                  y: -4, 
+                  borderColor: "rgba(212,175,55,0.25)",
+                  boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)"
+                }}
+                className={`relative group overflow-hidden transition-all duration-300 ${feature.size === 'large'
                   ? 'md:col-span-2 lg:col-span-2 bg-[#111] border border-white/5 rounded-3xl p-8 sm:p-10'
                   : feature.size === 'medium'
                     ? 'bg-[#111] border border-white/5 rounded-3xl p-7'
                     : 'bg-[#111] border border-white/5 rounded-3xl p-6'
                   }`}
               >
-                <div
-                  className={`flex items-center justify-center rounded-2xl mb-5 ${feature.size === 'large'
-                    ? 'w-14 h-14 bg-gold-500/10 text-gold-500'
-                    : 'w-11 h-11 bg-white/5 text-earth-300'
+                <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/0 via-transparent to-[#D4AF37]/0 group-hover:from-[#D4AF37]/5 group-hover:to-transparent transition-colors duration-500 z-0" />
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  className={`relative z-10 flex items-center justify-center rounded-2xl mb-5 transition-colors duration-300 ${feature.size === 'large'
+                    ? 'w-14 h-14 bg-gold-500/10 text-gold-500 group-hover:bg-gold-500/20 group-hover:text-gold-400'
+                    : 'w-11 h-11 bg-white/5 text-earth-300 group-hover:text-gold-400 group-hover:bg-gold-500/15'
                     }`}
                 >
                   {feature.icon}
-                </div>
+                </motion.div>
                 <h3
-                  className={`font-bold text-white ${feature.size === 'large' ? 'text-2xl' : 'text-lg'
+                  className={`relative z-10 font-bold text-white transition-colors duration-300 group-hover:text-gold-400 ${feature.size === 'large' ? 'text-2xl' : 'text-lg'
                     }`}
                 >
                   {feature.title}
                 </h3>
                 <p
-                  className={`text-earth-400 mt-2 font-medium ${feature.size === 'large' ? 'max-w-md' : 'text-sm'
+                  className={`relative z-10 text-earth-400 mt-2 font-medium transition-colors duration-300 group-hover:text-earth-300 ${feature.size === 'large' ? 'max-w-md' : 'text-sm'
                     }`}
                 >
                   {feature.description}
@@ -486,15 +510,15 @@ export default function Landing() {
       <section className="section-padding relative bg-black">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 100, scale: 0.9 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ type: "spring", stiffness: 100, damping: 20 }}
-            className="bg-[#0a0a0a] border border-white/5 p-10 sm:p-16 lg:p-20 relative overflow-hidden text-center rounded-[3rem]"
+            transition={{ type: "spring", stiffness: 80, damping: 20 }}
+            className="bg-[#0a0a0a] border border-white/5 p-10 sm:p-16 lg:p-20 relative overflow-hidden text-center rounded-[3rem] shadow-[0_0_100px_rgba(212,175,55,0.05)] hover:border-white/10 transition-colors duration-500"
           >
-            {/* Decorative gradients */}
-            <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gold-500/10 blur-[100px]" />
-            <div className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full bg-indigo-500/10 blur-[100px]" />
+            {/* Lightweight Static Gradients */}
+            <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-gold-500/10 blur-[100px] pointer-events-none" />
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-indigo-500/5 blur-[100px] pointer-events-none" />
 
             <div className="relative z-10">
               <div className="flex items-center justify-center gap-2 mb-6">
@@ -518,10 +542,10 @@ export default function Landing() {
                   <motion.div 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-gold-500 text-black font-extrabold px-10 py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(234,179,8,0.2)]"
+                    className="relative group bg-gradient-to-r from-[#B5A642] to-[#8A7E2A] text-black font-extrabold px-10 py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(181,166,66,0.3)] overflow-hidden"
                   >
-                    Create Free Account
-                    <ArrowRight className="w-5 h-5" />
+                    <span className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-500 -translate-x-full skew-x-12 pointer-events-none" />
+                    <span className="relative flex items-center gap-2">Create Free Account <ArrowRight className="w-5 h-5" /></span>
                   </motion.div>
                 </Link>
               </div>
@@ -573,7 +597,7 @@ export default function Landing() {
                   <li key={link.path}>
                     <Link
                       to={link.path}
-                      className="text-sm font-bold text-earth-400 hover:text-gold-500 transition-colors"
+                      className="inline-block text-sm font-bold text-earth-400 hover:text-gold-500 hover:translate-x-2 transition-all duration-300"
                     >
                       {link.name}
                     </Link>
@@ -589,7 +613,7 @@ export default function Landing() {
               <ul className="space-y-3">
                 {['Terms of Service', 'Privacy Policy', 'Accessibility'].map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-sm font-bold text-earth-400 hover:text-gold-500 transition-colors">
+                    <a href="#" className="inline-block text-sm font-bold text-earth-400 hover:text-gold-500 hover:translate-x-2 transition-all duration-300">
                       {item}
                     </a>
                   </li>

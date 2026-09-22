@@ -23,7 +23,7 @@ export default function MyClaims() {
   return (
     <div className="relative p-4 sm:p-8 pt-6 sm:pt-10 min-h-screen">
       <div className="max-w-5xl mx-auto animate-fade-up">
-        
+
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-400 via-gold-500 to-amber-600 flex items-center justify-center shadow-lg shadow-gold-500/25">
@@ -84,19 +84,17 @@ export default function MyClaims() {
                   style={{ animationDelay: `${Math.min(idx * 60, 350)}ms` }}
                 >
                   {/* Status Indicator Bar */}
-                  <div className={`absolute top-0 left-0 w-full h-1 ${
-                    isApproved ? 'bg-emerald-500 shadow-md shadow-emerald-500/50' :
-                    isRejected ? 'bg-red-500' : 'bg-gold-500'
-                  }`} />
-                  
+                  <div className={`absolute top-0 left-0 w-full h-1 ${isApproved ? 'bg-emerald-500 shadow-md shadow-emerald-500/50' :
+                      isRejected ? 'bg-red-500' : 'bg-gold-500'
+                    }`} />
+
                   <div>
                     <div className="flex justify-between items-start gap-4 mb-4">
                       <div>
-                        <span className={`badge mb-2.5 ${
-                          isApproved ? 'badge-active shadow-sm' :
-                          isRejected ? 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30' :
-                          'badge-pending shadow-sm'
-                        }`}>
+                        <span className={`badge mb-2.5 ${isApproved ? 'badge-active shadow-sm' :
+                            isRejected ? 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30' :
+                              'badge-pending shadow-sm'
+                          }`}>
                           {isApproved && <CheckCircle2 className="w-3.5 h-3.5" />}
                           {isRejected && <XCircle className="w-3.5 h-3.5" />}
                           {!isApproved && !isRejected && <Clock className="w-3.5 h-3.5" />}
@@ -109,7 +107,7 @@ export default function MyClaims() {
                           Submitted on {new Date(claim.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                       </div>
-                      
+
                       {claim.item?.imageUrls[0] ? (
                         <img src={claim.item.imageUrls[0]} alt="" className="w-14 h-14 rounded-xl object-cover border border-earth-200/80 dark:border-white/10 flex-shrink-0 group-hover:scale-108 transition-transform duration-300 shadow-inner" />
                       ) : (
@@ -121,7 +119,7 @@ export default function MyClaims() {
                   </div>
 
                   <div className="flex gap-3 mt-3">
-                    <Link 
+                    <Link
                       to={`/items/${claim.itemId}`}
                       className="btn-secondary flex-1 py-2.5 text-xs font-bold text-center flex items-center justify-center gap-1.5 active:scale-98"
                     >

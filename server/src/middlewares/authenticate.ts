@@ -47,10 +47,45 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     });
 
     if (!user || user.deletedAt || !user.isActive) {
-      return next(new AppError('This account is no longer active. Please contact support.', 403, 'ACCOUNT_INACTIVE'));
+      return next(new AppError('This account is no longer active.', 403, 'ACCOUNT_INACTIVE'));
     }
 
     req.user = decoded;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Middleware: authenticateOptional
+ *
+ * Reads the JWT from the cookie. If valid, attaches req.user.
+ * If invalid or missing, simply proceeds without req.user.
+ */
+export const authenticateOptional = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies?.token as string | undefined;
+
+  if (!token) {
+    return next();
+  }
+
+  let decoded: JwtPayload;
+  try {
+    decoded = verifyToken(token);
+  } catch {
+    return next();
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { isActive: true, deletedAt: true },
+    });
+
+    if (user && !user.deletedAt && user.isActive) {
+      req.user = decoded;
+    }
     next();
   } catch (error) {
     next(error);

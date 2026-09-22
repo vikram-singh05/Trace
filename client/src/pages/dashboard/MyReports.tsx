@@ -28,7 +28,7 @@ export default function MyReports() {
   return (
     <div className="relative p-4 sm:p-8 pt-6 sm:pt-10">
       <div className="max-w-6xl mx-auto animate-fade-up">
-        
+
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div>
@@ -94,12 +94,12 @@ export default function MyReports() {
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-xl bg-earth-100 dark:bg-black/50 overflow-hidden flex-shrink-0 border border-earth-200/80 dark:border-white/10 group-hover:border-gold-500/50 transition-colors shadow-inner">
                             {item.imageUrls[0] ? (
-                               <img src={item.imageUrls[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300" />
-                             ) : (
-                               <div className="w-full h-full flex items-center justify-center text-lg">
-                                 {item.category.icon}
-                                </div>
-                             )}
+                              <img src={item.imageUrls[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-lg">
+                                {item.category.icon}
+                              </div>
+                            )}
                           </div>
                           <div>
                             <Link to={`/items/${item.id}`} className="font-bold text-earth-900 dark:text-white hover:text-gold-500 dark:hover:text-gold-400 transition-colors line-clamp-1 text-sm">
@@ -110,18 +110,16 @@ export default function MyReports() {
                         </div>
                       </td>
                       <td className="p-5">
-                        <span className={`badge ${
-                          item.type === 'FOUND' ? 'badge-found shadow-sm' : 'badge-lost shadow-sm'
-                        }`}>
+                        <span className={`badge ${item.type === 'FOUND' ? 'badge-found shadow-sm' : 'badge-lost shadow-sm'
+                          }`}>
                           {item.type}
                         </span>
                       </td>
                       <td className="p-5">
-                        <span className={`badge ${
-                          item.status === 'ACTIVE' ? 'badge-active' :
-                          item.status === 'RESOLVED' ? 'badge-resolved' :
-                          'badge-pending'
-                        }`}>
+                        <span className={`badge ${item.status === 'ACTIVE' ? 'badge-active' :
+                            item.status === 'RESOLVED' ? 'badge-resolved' :
+                              'badge-pending'
+                          }`}>
                           {item.status.replace('_', ' ')}
                         </span>
                       </td>

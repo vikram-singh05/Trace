@@ -64,9 +64,25 @@ export const resendOtpSchema = z.object({
   email: z.string().email().toLowerCase().trim(),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Please enter a valid email address').toLowerCase().trim(),
+});
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email('Please enter a valid email address').toLowerCase().trim(),
+  otp: z.string().length(6, 'OTP must be exactly 6 digits'),
+  newPassword: passwordSchema,
+  confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+
 // ── Inferred TypeScript types ─────────────────────────────────────
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput    = z.infer<typeof loginSchema>;
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 export type ResendOtpInput = z.infer<typeof resendOtpSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

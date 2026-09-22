@@ -1,5 +1,5 @@
 import axiosClient from '../lib/axiosClient';
-import type { User, LoginInput, RegisterInput, ApiSuccess } from '../types';
+import type { User, LoginInput, RegisterInput, ResetPasswordInput, ApiSuccess } from '../types';
 
 type AuthResponse = ApiSuccess<{ user: User }>;
 
@@ -20,6 +20,14 @@ export const authApi = {
 
   logout: async (): Promise<void> => {
     await axiosClient.post('/auth/logout');
+  },
+
+  forgotPassword: async (email: string): Promise<void> => {
+    await axiosClient.post('/auth/forgot-password', { email });
+  },
+
+  resetPassword: async (data: ResetPasswordInput): Promise<void> => {
+    await axiosClient.post('/auth/reset-password', data);
   },
 
 

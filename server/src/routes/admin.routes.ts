@@ -13,5 +13,7 @@ router.get('/users', AdminController.getUsers);
 router.patch('/users/:id/status', AdminController.updateUserStatus);
 router.get('/items', AdminController.getItems);
 router.patch('/items/:id/moderate', AdminController.moderateItem);
+router.get('/support', AdminController.getSupportTickets);
+router.patch('/support/:id/status', AdminController.updateSupportTicketStatus);
 
 export default router;

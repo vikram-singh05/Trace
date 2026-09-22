@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit';
 import * as AuthController from '../controllers/auth.controller';
 import { authenticate } from '../middlewares/authenticate';
 import { validate } from '../middlewares/validate';
-import { registerSchema, loginSchema, verifyOtpSchema, resendOtpSchema } from '../validators/auth.validator';
+import { registerSchema, loginSchema, verifyOtpSchema, resendOtpSchema, forgotPasswordSchema, resetPasswordSchema } from '../validators/auth.validator';
 
 const router = Router();
 
@@ -92,6 +92,34 @@ const resendOtpLimiter = rateLimit({
   },
 });
 
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'RATE_LIMITED',
+      message: 'Too many password reset requests. Please try again in an hour.',
+    },
+  },
+});
+
+const resetPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'RATE_LIMITED',
+      message: 'Too many attempts. Please try again in 15 minutes.',
+    },
+  },
+});
+
 // ── Routes ────────────────────────────────────────────────────────
 //
 // Middleware chain is read left-to-right:
@@ -131,6 +159,20 @@ router.post(
   resendOtpLimiter,
   validate(resendOtpSchema),
   AuthController.resendOtp
+);
+
+router.post(
+  '/forgot-password',
+  forgotPasswordLimiter,
+  validate(forgotPasswordSchema),
+  AuthController.forgotPassword
+);
+
+router.post(
+  '/reset-password',
+  resetPasswordLimiter,
+  validate(resetPasswordSchema),
+  AuthController.resetPassword
 );
 
 /**

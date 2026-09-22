@@ -9,7 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 export default function Messages() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
-  
+
   const activeConversationId = searchParams.get('conversationId');
 
   const { data: conversations, isLoading, isError } = useQuery({
@@ -58,28 +58,28 @@ export default function Messages() {
 
   const getOtherParty = (conv: Conversation) => {
     if (!user) return { name: 'Unknown', id: '', avatarUrl: null };
-    
+
     // If the current user is the reporter, the other party is the claimant
     if (user.id === conv.claim.item.reporterId) {
-      return { 
-        name: conv.claim.claimant.name, 
-        id: conv.claim.claimant.id, 
-        avatarUrl: conv.claim.claimant.avatarUrl 
+      return {
+        name: conv.claim.claimant.name,
+        id: conv.claim.claimant.id,
+        avatarUrl: conv.claim.claimant.avatarUrl
       };
     }
-    
+
     // If the current user is the claimant, the other party is the item reporter
-    return { 
-      name: conv.claim.item.reporter.name, 
-      id: conv.claim.item.reporterId, 
-      avatarUrl: conv.claim.item.reporter.avatarUrl 
+    return {
+      name: conv.claim.item.reporter.name,
+      id: conv.claim.item.reporterId,
+      avatarUrl: conv.claim.item.reporter.avatarUrl
     };
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-4rem)]">
       <div className="flex h-full gap-6 animate-fade-up">
-        
+
         {/* Sidebar List */}
         <div className="w-full md:w-80 flex-shrink-0 flex flex-col bg-white dark:bg-earth-900/40 rounded-2xl border border-earth-200 dark:border-earth-700/50 overflow-hidden shadow-sm">
           <div className="p-5 border-b border-earth-200 dark:border-earth-700/50 bg-earth-50/50 dark:bg-black/20">
@@ -92,20 +92,18 @@ export default function Messages() {
             {conversations.map((conv) => {
               const otherParty = getOtherParty(conv);
               const isActive = conv.id === activeConversationId;
-              
+
               return (
                 <button
                   key={conv.id}
                   onClick={() => setSearchParams({ conversationId: conv.id })}
-                  className={`w-full text-left p-3 rounded-xl transition-all flex items-center gap-3 group ${
-                    isActive 
-                      ? 'bg-gold-50 dark:bg-gold-900/20 border border-gold-200 dark:border-gold-800/50 shadow-sm' 
+                  className={`w-full text-left p-3 rounded-xl transition-all flex items-center gap-3 group ${isActive
+                      ? 'bg-gold-50 dark:bg-gold-900/20 border border-gold-200 dark:border-gold-800/50 shadow-sm'
                       : 'hover:bg-earth-50 dark:hover:bg-earth-800/40 border border-transparent'
-                  }`}
+                    }`}
                 >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    isActive ? 'bg-gold-100 dark:bg-gold-900/50 text-gold-600' : 'bg-earth-100 dark:bg-earth-800 text-earth-500'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isActive ? 'bg-gold-100 dark:bg-gold-900/50 text-gold-600' : 'bg-earth-100 dark:bg-earth-800 text-earth-500'
+                    }`}>
                     {otherParty.avatarUrl ? (
                       <img src={otherParty.avatarUrl} alt={otherParty.name} className="w-full h-full rounded-full object-cover" />
                     ) : (
@@ -120,9 +118,8 @@ export default function Messages() {
                       Re: {conv.claim.item.title}
                     </p>
                   </div>
-                  <ChevronRight className={`w-4 h-4 flex-shrink-0 transition-transform ${
-                    isActive ? 'text-gold-500 translate-x-1' : 'text-earth-300 dark:text-earth-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2'
-                  }`} />
+                  <ChevronRight className={`w-4 h-4 flex-shrink-0 transition-transform ${isActive ? 'text-gold-500 translate-x-1' : 'text-earth-300 dark:text-earth-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2'
+                    }`} />
                 </button>
               );
             })}
@@ -132,7 +129,7 @@ export default function Messages() {
         {/* Main Chat Area */}
         <div className="hidden md:flex flex-1 flex-col relative h-full">
           {activeConversation ? (
-            <ChatWindow 
+            <ChatWindow
               conversationId={activeConversation.id}
               otherPartyName={getOtherParty(activeConversation).name}
               otherPartyId={getOtherParty(activeConversation).id}

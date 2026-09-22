@@ -66,12 +66,12 @@ export default function Dashboard() {
 
   return (
     <div className="relative p-4 sm:p-8 pt-6 sm:pt-10 min-h-screen overflow-hidden bg-earth-50 dark:bg-earth-950 transition-colors duration-500">
-      
+
       {/* ── Background Elements ── */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold-500/10 rounded-full filter blur-[100px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-earth-500/10 rounded-full filter blur-[100px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
 
-      <motion.div 
+      <motion.div
         initial="hidden"
         animate="visible"
         variants={{
@@ -82,7 +82,7 @@ export default function Dashboard() {
       >
 
         {/* ── User Welcome Header ── */}
-        <motion.div 
+        <motion.div
           variants={{
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
@@ -90,9 +90,9 @@ export default function Dashboard() {
           className="p-6 sm:p-8 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden group bg-white/40 dark:bg-earth-900/40 backdrop-blur-3xl backdrop-saturate-200 border border-earth-200/60 dark:border-earth-800/50 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-gold-500/20 transition-colors duration-1000" />
-          
+
           <div className="flex items-center gap-5 relative z-10">
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05, rotate: -5 }}
               className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-gold-500/25 flex-shrink-0 border border-gold-300/30"
             >
@@ -148,7 +148,7 @@ export default function Dashboard() {
 
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
-                    <motion.div 
+                    <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       className="w-12 h-12 rounded-2xl bg-white/80 dark:bg-earth-800 border border-earth-200/50 dark:border-earth-700/50 flex items-center justify-center shadow-sm transition-colors group-hover:border-gold-500/30"
                     >
@@ -161,14 +161,13 @@ export default function Dashboard() {
 
                   <div className="flex items-end justify-between">
                     <div className="pr-4">
-                      <h3 className={`font-bold text-earth-900 dark:text-earth-50 group-hover:text-gold-600 dark:group-hover:text-gold-400 transition-colors ${
-                        item.variant === 'feature' ? 'text-xl' : 'text-base'
-                      }`}>
+                      <h3 className={`font-bold text-earth-900 dark:text-earth-50 group-hover:text-gold-600 dark:group-hover:text-gold-400 transition-colors ${item.variant === 'feature' ? 'text-xl' : 'text-base'
+                        }`}>
                         {item.title}
                       </h3>
                       <p className="body-text mt-1.5 text-xs sm:text-sm leading-relaxed">{item.description}</p>
                     </div>
-                    <motion.div 
+                    <motion.div
                       whileHover={{ scale: 1.1 }}
                       className="w-8 h-8 rounded-xl bg-white/80 dark:bg-earth-800 flex items-center justify-center flex-shrink-0 group-hover:bg-gold-500 group-hover:text-white transition-all duration-300 border border-earth-200/50 dark:border-earth-700/50"
                     >

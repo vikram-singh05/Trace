@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { signToken } from '../utils/jwt';
 import * as AuthService from '../services/auth.service';
 import { env } from '../config/env';
-import type { RegisterInput, LoginInput } from '../validators/auth.validator';
+import type { RegisterInput, LoginInput, ForgotPasswordInput, ResetPasswordInput } from '../validators/auth.validator';
 
 // ── Cookie Configuration ──────────────────────────────────────────
 
@@ -92,6 +92,40 @@ export const resendOtp = async (
     res.status(200).json({
       success: true,
       message: 'A new verification code has been sent to your email.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const forgotPassword = async (
+  req: Request<{}, {}, ForgotPasswordInput>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await AuthService.forgotPassword(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: 'If the email exists, a password reset code has been sent.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (
+  req: Request<{}, {}, ResetPasswordInput>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await AuthService.resetPassword(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully.',
     });
   } catch (error) {
     next(error);

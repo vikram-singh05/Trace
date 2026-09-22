@@ -57,6 +57,12 @@ enum NotificationType {
   ITEM_MODERATED  // Admin removed or flagged the item
 }
 
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
 // ─────────────────────────────────────────────────────────────────
 //  MODELS
 // ─────────────────────────────────────────────────────────────────
@@ -87,6 +93,7 @@ model User {
   messages      Message[]
   reportsSubmitted UserReport[] @relation("ReportedBy")
   reportsReceived  UserReport[] @relation("ReportedUser")
+  supportTickets   SupportTicket[]
 
   @@map("users")
 }
@@ -331,4 +338,22 @@ model UserReport {
   @@index([status])
   @@index([reportedId])
   @@map("user_reports")
+}
+
+model SupportTicket {
+  id        String       @id @default(cuid())
+  email     String
+  name      String?
+  subject   String
+  message   String
+  status    TicketStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([userId])
+  @@map("support_tickets")
 }

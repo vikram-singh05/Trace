@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../api/authApi';
 import { connectSocket, disconnectSocket } from '../lib/socket';
-import type { User, LoginInput, RegisterInput } from '../types';
+import type { User, LoginInput, RegisterInput, ResetPasswordInput } from '../types';
 
 
 interface AuthContextValue {
@@ -26,6 +26,9 @@ interface AuthContextValue {
   register: (data: RegisterInput) => Promise<void>;
 
   verifyOtp: (email: string, otp: string) => Promise<void>;
+  
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (data: ResetPasswordInput) => Promise<void>;
 
   logout: () => Promise<void>;
 }
@@ -77,6 +80,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     queryClient.clear();
   }, [queryClient]);
 
+  const forgotPassword = useCallback(async (email: string) => {
+    await authApi.forgotPassword(email);
+  }, []);
+
+  const resetPassword = useCallback(async (data: ResetPasswordInput) => {
+    await authApi.resetPassword(data);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -87,6 +98,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         register,
         verifyOtp,
+        forgotPassword,
+        resetPassword,
         logout,
       }}
     >

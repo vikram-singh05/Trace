@@ -6,6 +6,7 @@ export interface AdminStats {
   activeItems: number;
   resolvedItems: number;
   totalMatches: number;
+  openSupportTickets: number;
 }
 
 export interface User {
@@ -29,6 +30,27 @@ export interface AdminUsersResponse {
 
 export interface AdminItemsResponse {
   items: Item[];
+  total: number;
+  pages: number;
+}
+
+export interface SupportTicket {
+  id: string;
+  email: string;
+  name: string | null;
+  subject: string;
+  message: string;
+  status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
+  createdAt: string;
+  user: {
+    name: string;
+    email: string;
+    role: string;
+  } | null;
+}
+
+export interface AdminSupportResponse {
+  tickets: SupportTicket[];
   total: number;
   pages: number;
 }
@@ -57,5 +79,15 @@ export const adminApi = {
   moderateItem: async (itemId: string, action: 'DELETE' | 'RESTORE' | 'HARD_DELETE'): Promise<Item> => {
     const res = await axiosClient.patch(`/admin/items/${itemId}/moderate`, { action });
     return res.data.data.item;
+  },
+
+  getSupportTickets: async (page = 1): Promise<AdminSupportResponse> => {
+    const res = await axiosClient.get('/admin/support', { params: { page } });
+    return res.data.data;
+  },
+
+  updateSupportTicketStatus: async (ticketId: string, status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED', resolutionMessage?: string): Promise<SupportTicket> => {
+    const res = await axiosClient.patch(`/admin/support/${ticketId}/status`, { status, resolutionMessage });
+    return res.data.data.ticket;
   },
 };

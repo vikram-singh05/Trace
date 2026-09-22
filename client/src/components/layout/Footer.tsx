@@ -128,14 +128,19 @@ export default function Footer() {
             <span className="hidden sm:inline">Crafted with precision.</span>
           </div>
           <div className="flex gap-3">
-            {['Twitter', 'GitHub', 'LinkedIn'].map((social, i) => (
+            {[
+              { name: 'GitHub', url: 'https://github.com/vikram-singh05' },
+              { name: 'LinkedIn', url: 'https://www.linkedin.com/in/vikram-singh05/' }
+            ].map((social, i) => (
               <motion.a 
                 key={i}
-                href="#" 
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover={{ y: -3, scale: 1.05 }}
                 className="px-4 py-2 rounded-xl bg-white/50 dark:bg-white/5 border border-earth-200/50 dark:border-white/10 text-earth-600 dark:text-earth-400 hover:text-gold-600 dark:hover:text-gold-400 hover:border-gold-500/30 transition-all text-xs font-bold tracking-wide shadow-sm"
               >
-                {social}
+                {social.name}
               </motion.a>
             ))}
           </div>

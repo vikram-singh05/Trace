@@ -66,3 +66,31 @@ export const moderateItem = async (req: Request, res: Response, next: NextFuncti
     next(error);
   }
 };
+
+export const getSupportTickets = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const result = await AdminService.getSupportTickets(page, limit);
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSupportTicketStatus = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { status, resolutionMessage } = req.body;
+
+    if (!['OPEN', 'IN_PROGRESS', 'RESOLVED'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid status' });
+    }
+
+    const updatedTicket = await AdminService.updateSupportTicketStatus(id, status, resolutionMessage);
+    res.status(200).json({ success: true, data: { ticket: updatedTicket } });
+  } catch (error) {
+    next(error);
+  }
+};

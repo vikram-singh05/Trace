@@ -55,7 +55,7 @@ export default function BrowseItems() {
 
   return (
     <div className="relative p-4 sm:p-8 pt-6 sm:pt-10 min-h-screen overflow-hidden bg-earth-50 dark:bg-earth-950 transition-colors duration-500">
-      
+
       {/* ── Background Elements ── */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold-500/10 rounded-full filter blur-[100px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-earth-500/10 rounded-full filter blur-[100px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
@@ -63,7 +63,7 @@ export default function BrowseItems() {
       <div className="max-w-7xl mx-auto relative z-10">
 
         {/* ── Header ── */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -77,7 +77,7 @@ export default function BrowseItems() {
             <h1 className="heading-1 text-earth-900 dark:text-white">Explore Listings</h1>
             <p className="body-text mt-2 text-sm sm:text-base text-earth-600 dark:text-earth-400">Search, filter, and track items across all locations.</p>
           </div>
-          
+
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               to="/report"
@@ -90,7 +90,7 @@ export default function BrowseItems() {
         </motion.div>
 
         {/* ── Category Quick Filter Chips ── */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -101,11 +101,10 @@ export default function BrowseItems() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => handleFilterChange('categoryId', undefined)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                !filters.categoryId
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${!filters.categoryId
                   ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-md shadow-gold-500/20'
                   : 'bg-white/60 dark:bg-earth-900/40 text-earth-700 dark:text-earth-300 border border-earth-200/50 dark:border-earth-800/50 hover:bg-white/90 dark:hover:bg-earth-800 backdrop-blur-md'
-              }`}
+                }`}
             >
               <LayoutGrid className="w-4 h-4" />
               <span>All Categories</span>
@@ -118,11 +117,10 @@ export default function BrowseItems() {
                   whileTap={{ scale: 0.95 }}
                   key={cat.id}
                   onClick={() => handleFilterChange('categoryId', isSelected ? undefined : cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                    isSelected
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${isSelected
                       ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-md shadow-gold-500/20'
                       : 'bg-white/60 dark:bg-earth-900/40 text-earth-700 dark:text-earth-300 border border-earth-200/50 dark:border-earth-800/50 hover:bg-white/90 dark:hover:bg-earth-800 backdrop-blur-md'
-                  }`}
+                    }`}
                 >
                   <span className="text-base leading-none drop-shadow-sm">{cat.icon}</span>
                   <span>{cat.name}</span>
@@ -133,14 +131,14 @@ export default function BrowseItems() {
         </motion.div>
 
         {/* ── Type Selector Tabs & Search Filter Bar ── */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="relative z-50 bg-white/40 dark:bg-earth-900/40 backdrop-blur-3xl backdrop-saturate-200 border border-earth-200/50 dark:border-earth-800/50 p-4 rounded-3xl mb-10 space-y-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
         >
           <div className="flex flex-col lg:flex-row items-center gap-4">
-            
+
             {/* Search Input */}
             <form onSubmit={handleSearch} className="flex-1 w-full relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-earth-400" />
@@ -182,31 +180,28 @@ export default function BrowseItems() {
             <div className="flex items-center p-1.5 bg-earth-100/50 dark:bg-earth-950/50 rounded-2xl w-full lg:w-auto shadow-inner border border-earth-200/50 dark:border-earth-800/50">
               <button
                 onClick={() => handleFilterChange('type', undefined)}
-                className={`flex-1 lg:flex-none px-5 py-2 rounded-xl text-xs font-bold transition-all ${
-                  !filters.type
+                className={`flex-1 lg:flex-none px-5 py-2 rounded-xl text-xs font-bold transition-all ${!filters.type
                     ? 'bg-white dark:bg-earth-800 text-earth-900 dark:text-white shadow-sm border border-earth-200/50 dark:border-earth-700/50'
                     : 'text-earth-500 hover:text-earth-900 dark:hover:text-white'
-                }`}
+                  }`}
               >
                 All
               </button>
               <button
                 onClick={() => handleFilterChange('type', 'LOST')}
-                className={`flex-1 lg:flex-none px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 justify-center ${
-                  filters.type === 'LOST'
+                className={`flex-1 lg:flex-none px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 justify-center ${filters.type === 'LOST'
                     ? 'bg-white dark:bg-earth-800 text-earth-900 dark:text-white shadow-sm border border-earth-200/50 dark:border-earth-700/50'
                     : 'text-earth-500 hover:text-earth-900 dark:hover:text-white'
-                }`}
+                  }`}
               >
                 <span className={`w-2 h-2 rounded-full ${filters.type === 'LOST' ? 'bg-red-500 animate-pulse-glow' : 'bg-red-500/50'}`} /> Lost
               </button>
               <button
                 onClick={() => handleFilterChange('type', 'FOUND')}
-                className={`flex-1 lg:flex-none px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 justify-center ${
-                  filters.type === 'FOUND'
+                className={`flex-1 lg:flex-none px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 justify-center ${filters.type === 'FOUND'
                     ? 'bg-white dark:bg-earth-800 text-earth-900 dark:text-white shadow-sm border border-earth-200/50 dark:border-earth-700/50'
                     : 'text-earth-500 hover:text-earth-900 dark:hover:text-white'
-                }`}
+                  }`}
               >
                 <span className={`w-2 h-2 rounded-full ${filters.type === 'FOUND' ? 'bg-emerald-500 animate-pulse-glow' : 'bg-emerald-500/50'}`} /> Found
               </button>
@@ -263,7 +258,7 @@ export default function BrowseItems() {
             Failed to load the database. Please initialize a retry.
           </div>
         ) : data?.items.length === 0 ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-24 bg-white/40 dark:bg-earth-900/40 backdrop-blur-3xl backdrop-saturate-200 rounded-3xl border border-earth-200/50 dark:border-earth-800/50 shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
@@ -274,10 +269,10 @@ export default function BrowseItems() {
             <h3 className="text-xl font-bold text-earth-900 dark:text-white mb-2">No items detected</h3>
             <p className="text-sm text-earth-500 max-w-sm mx-auto mb-8 font-medium">Try broadening your search term or clearing the active filters.</p>
             {hasActiveFilters && (
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={clearFilters} 
+                onClick={clearFilters}
                 className="btn-primary px-8 bg-gradient-to-r from-gold-500 to-gold-600 border-gold-600/50"
               >
                 Clear all filters
@@ -328,21 +323,21 @@ export default function BrowseItems() {
                             <span className="text-[10px] font-bold uppercase tracking-widest text-earth-500">No Image</span>
                           </div>
                         )}
-                        
+
                         {/* Status Indicator */}
                         <div className="absolute top-3 left-3 z-10">
                           <span className={`px-2.5 py-1 text-[10px] font-bold rounded-lg tracking-wider shadow-md backdrop-blur-md border ${isFound ? 'bg-emerald-500/90 text-white border-emerald-400/50' : 'bg-red-500/90 text-white border-red-400/50'}`}>
                             {item.type}
                           </span>
                         </div>
-                        
+
                         {item.imageUrls.length > 1 && (
                           <div className="absolute bottom-3 right-3 px-2 py-1 rounded-lg bg-white/90 dark:bg-earth-900/90 backdrop-blur-md text-[11px] font-bold text-earth-900 dark:text-white shadow-lg border border-earth-200/50 dark:border-earth-700/50">
                             +{item.imageUrls.length - 1} photos
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Content Section */}
                       <div className="p-5 flex-1 flex flex-col relative">
                         <div className="flex items-center gap-2 text-[11px] font-bold text-earth-500 uppercase tracking-widest mb-2">
@@ -352,7 +347,7 @@ export default function BrowseItems() {
                         <h3 className="text-base font-bold text-earth-900 dark:text-earth-50 mb-4 line-clamp-2 leading-snug group-hover:text-gold-600 dark:group-hover:text-gold-400 transition-colors">
                           {item.title}
                         </h3>
-                        
+
                         <div className="mt-auto space-y-2 pt-4 border-t border-earth-200/50 dark:border-earth-700/50">
                           <div className="flex items-center gap-2 text-xs text-earth-600 dark:text-earth-400 font-semibold">
                             <MapPin className="w-4 h-4 text-gold-500 flex-shrink-0" />
@@ -369,10 +364,10 @@ export default function BrowseItems() {
                 );
               })}
             </motion.div>
-            
+
             {/* Pagination Controls */}
             {data && data.pagination.totalPages > 1 && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}

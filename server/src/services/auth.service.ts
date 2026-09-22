@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../config/prisma';
 import { AppError } from '../utils/AppError';
-import type { RegisterInput, LoginInput } from '../validators/auth.validator';
+import type { RegisterInput, LoginInput, ForgotPasswordInput, ResetPasswordInput } from '../validators/auth.validator';
 import type { UserResponse } from '../types';
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -222,6 +222,99 @@ export const resendOtp = async (email: string) => {
 };
 
 /**
+ * Initiates the password reset flow.
+ * Generates an OTP, saves it to the user record, and sends an email.
+ */
+export const forgotPassword = async (input: ForgotPasswordInput) => {
+  const user = await prisma.user.findUnique({ where: { email: input.email } });
+
+  if (!user) {
+    // Return success even if user not found to prevent user enumeration
+    return { success: true };
+  }
+
+  // Soft-deleted or banned users cannot reset passwords
+  if (user.deletedAt || !user.isActive) {
+    return { success: true }; 
+  }
+
+  const otpCode = generateOTP();
+  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+  await prisma.user.update({
+    where: { email: input.email },
+    data: { otpCode, otpExpiresAt, otpAttempts: 0 },
+  });
+
+  await sendEmail({
+    to: input.email,
+    subject: 'Reset Your Trace Password',
+    html: `
+      <div style="font-family: sans-serif; text-align: center; padding: 40px 20px; background: #f8fafc;">
+        <h1 style="color: #0f172a; margin-bottom: 20px;">Password Reset</h1>
+        <p style="color: #475569; font-size: 16px; margin-bottom: 30px;">Use the following code to reset your password:</p>
+        <div style="background: white; padding: 20px; border-radius: 12px; display: inline-block; font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #3b82f6; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          ${otpCode}
+        </div>
+        <p style="color: #64748b; font-size: 14px; margin-top: 30px;">This code expires in 10 minutes. If you did not request this, please ignore this email.</p>
+      </div>
+    `
+  });
+
+  return { success: true };
+};
+
+/**
+ * Completes the password reset flow.
+ * Verifies the OTP and updates the password.
+ */
+export const resetPassword = async (input: ResetPasswordInput) => {
+  const user = await prisma.user.findUnique({ where: { email: input.email } });
+
+  if (!user) {
+    throw new AppError('User not found.', 404, 'USER_NOT_FOUND');
+  }
+
+  if (user.otpAttempts >= MAX_OTP_ATTEMPTS) {
+    throw new AppError(
+      'Too many failed attempts. Please request a new password reset code.',
+      429,
+      'OTP_LOCKED'
+    );
+  }
+
+  if (!user.otpExpiresAt || user.otpExpiresAt < new Date()) {
+    throw new AppError('Verification code has expired.', 400, 'EXPIRED_OTP');
+  }
+
+  if (user.otpCode !== input.otp) {
+    // Increment attempt counter before rejecting
+    await prisma.user.update({
+      where: { email: input.email },
+      data: { otpAttempts: { increment: 1 } },
+    });
+    throw new AppError('Invalid verification code.', 400, 'INVALID_OTP');
+  }
+
+  const passwordHash = await bcrypt.hash(input.newPassword, BCRYPT_ROUNDS);
+
+  await prisma.user.update({
+    where: { email: input.email },
+    data: {
+      passwordHash,
+      otpCode: null,
+      otpExpiresAt: null,
+      otpAttempts: 0,
+      // If they reset their password successfully, they implicitly proved they own the email
+      isVerified: true, 
+    },
+  });
+
+  return { success: true };
+};
+
+
+/**
  * Validates credentials and returns the user if correct.
  *
  * Throws:
@@ -247,7 +340,7 @@ export const loginUser = async (input: LoginInput): Promise<UserResponse> => {
   // Soft-deleted users cannot log in
   if (user.deletedAt) {
     throw new AppError(
-      'This account has been deactivated. Please contact support.',
+      'This account has been deactivated.',
       403,
       'ACCOUNT_DEACTIVATED'
     );
@@ -256,7 +349,7 @@ export const loginUser = async (input: LoginInput): Promise<UserResponse> => {
   // Banned users cannot log in
   if (!user.isActive) {
     throw new AppError(
-      'Your account has been suspended. Please contact support.',
+      'Your account has been suspended.',
       403,
       'ACCOUNT_SUSPENDED'
     );

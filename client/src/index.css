@@ -364,6 +364,25 @@
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
 }
 
+/* ── Webkit Autofill Overrides ── */
+.input-field:-webkit-autofill,
+.input-field:-webkit-autofill:hover, 
+.input-field:-webkit-autofill:focus, 
+.input-field:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #FAF9F7 inset !important;
+  -webkit-text-fill-color: #292524 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark .input-field:-webkit-autofill,
+.dark .input-field:-webkit-autofill:hover,
+.dark .input-field:-webkit-autofill:focus,
+.dark .input-field:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1C1917 inset !important;
+  -webkit-text-fill-color: #E7E5E4 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* ═══════════════════════════════════════════════════════
    STATUS BADGES
    ═══════════════════════════════════════════════════════ */

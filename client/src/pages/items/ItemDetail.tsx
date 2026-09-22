@@ -103,14 +103,13 @@ export default function ItemDetail() {
         </div>
 
         <div className="card-feature overflow-hidden shadow-2xl">
-          
+
           {/* Header Bar */}
           <div className="p-6 sm:p-8 border-b border-earth-200/80 dark:border-white/[0.06] bg-earth-50/50 dark:bg-white/[0.02] flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-3 flex-wrap">
-                <span className={`badge ${
-                  isFound ? 'badge-found shadow-md shadow-emerald-500/15' : 'badge-lost shadow-md shadow-indigo-500/15'
-                }`}>
+                <span className={`badge ${isFound ? 'badge-found shadow-md shadow-emerald-500/15' : 'badge-lost shadow-md shadow-indigo-500/15'
+                  }`}>
                   {item.type}
                 </span>
                 <span className="badge bg-white/80 dark:bg-white/[0.05] text-earth-700 dark:text-earth-300 border-earth-200/80 dark:border-white/10 shadow-sm">
@@ -130,13 +129,12 @@ export default function ItemDetail() {
                 <span>{new Date(item.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</span>
               </p>
             </div>
-            
+
             <div className="flex flex-col md:items-end gap-3">
-              <span className={`badge text-xs px-3 py-1.5 ${
-                item.status === 'ACTIVE' ? 'badge-active' :
-                item.status === 'RESOLVED' ? 'badge-resolved' :
-                'badge-pending'
-              }`}>
+              <span className={`badge text-xs px-3 py-1.5 ${item.status === 'ACTIVE' ? 'badge-active' :
+                  item.status === 'RESOLVED' ? 'badge-resolved' :
+                    'badge-pending'
+                }`}>
                 Status: {item.status.replace('_', ' ')}
               </span>
               {isOwner && (
@@ -147,14 +145,14 @@ export default function ItemDetail() {
                   >
                     Edit Listing
                   </Link>
-                  <button 
+                  <button
                     onClick={() => setShowDeleteConfirm(true)}
                     className="px-4 py-2 rounded-xl text-xs font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all"
                   >
                     Delete
                   </button>
                   {item.status === 'ACTIVE' && (
-                    <button 
+                    <button
                       onClick={() => setShowResolveConfirm(true)}
                       className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
                     >
@@ -167,14 +165,14 @@ export default function ItemDetail() {
           </div>
 
           <div className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
+
             {/* Left Col: Photo Gallery & Details */}
             <div className="lg:col-span-2 space-y-8">
-              
+
               {/* Photo Showcase */}
               {item.imageUrls.length > 0 && (
                 <div className="space-y-3">
-                  <div 
+                  <div
                     onClick={() => setPreviewImage(item.imageUrls[0])}
                     className="aspect-[16/10] w-full rounded-2xl overflow-hidden bg-earth-100 dark:bg-black/50 border border-earth-200/80 dark:border-white/10 cursor-pointer group relative shadow-inner"
                   >
@@ -188,8 +186,8 @@ export default function ItemDetail() {
                   {item.imageUrls.length > 1 && (
                     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
                       {item.imageUrls.map((url, idx) => (
-                        <div 
-                          key={idx} 
+                        <div
+                          key={idx}
                           onClick={() => setPreviewImage(url)}
                           className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-earth-100 dark:bg-black/50 border border-earth-200/80 dark:border-white/10 cursor-pointer hover:ring-2 ring-gold-400 transition-all hover:scale-105"
                         >
@@ -230,7 +228,7 @@ export default function ItemDetail() {
                     ))}
                   </ul>
                   {!isOwner && item.status === 'ACTIVE' && (
-                    <button 
+                    <button
                       onClick={() => setShowClaimModal(true)}
                       className="btn-primary w-full py-4 font-bold text-sm shadow-xl shadow-gold-500/25 flex items-center justify-center gap-2"
                     >
@@ -258,7 +256,7 @@ export default function ItemDetail() {
                   </div>
                   <div className="space-y-3">
                     {item.matches.map((match) => (
-                      <Link 
+                      <Link
                         key={match.id}
                         to={`/items/${match.item.id}`}
                         className="block bg-white/80 dark:bg-white/[0.04] p-4 rounded-xl border border-earth-200/80 dark:border-white/10 hover:border-indigo-400/50 hover:shadow-lg transition-all group"
@@ -355,7 +353,7 @@ export default function ItemDetail() {
               )}
 
               {!isOwner && item.type === 'LOST' && item.status === 'ACTIVE' && (
-                <button 
+                <button
                   onClick={() => setShowClaimModal(true)}
                   className="btn-primary w-full py-4 font-bold text-sm shadow-xl shadow-gold-500/25 flex items-center justify-center gap-2"
                 >
@@ -364,11 +362,11 @@ export default function ItemDetail() {
                 </button>
               )}
             </div>
-            
+
           </div>
         </div>
       </div>
-      
+
       {showClaimModal && (
         <ClaimModal
           itemId={item.id}

@@ -31,7 +31,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
 
       setIsDark(activeIsDark);
-      
+
       if (activeIsDark) {
         root.classList.add('dark');
       } else {

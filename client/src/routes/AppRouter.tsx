@@ -10,6 +10,7 @@ import Layout from '../components/layout/Layout';
 // landing page needs. Each import() becomes its own chunk automatically.
 const Login         = lazy(() => import('../pages/auth/Login'));
 const Register      = lazy(() => import('../pages/auth/Register'));
+const ForgotPassword = lazy(() => import('../pages/auth/ForgotPassword'));
 const Dashboard     = lazy(() => import('../pages/dashboard/Dashboard'));
 const ReportItem    = lazy(() => import('../pages/items/ReportItem'));
 const ItemDetail    = lazy(() => import('../pages/items/ItemDetail'));
@@ -24,6 +25,9 @@ const Messages      = lazy(() => import('../pages/chat/Messages'));
 const PrivacyPolicy = lazy(() => import('../pages/legal/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('../pages/legal/TermsOfService'));
 const Security       = lazy(() => import('../pages/legal/Security'));
+
+// Support
+const Support = lazy(() => import('../pages/support/Support'));
 
 /**
  * Shown briefly while a lazy route chunk downloads (typically instant on
@@ -63,6 +67,9 @@ export default function AppRouter() {
       <Routes>
         {/* Public landing page */}
         <Route path="/" element={<Landing />} />
+        
+        {/* Support page - Public */}
+        <Route path="/support" element={<Support />} />
 
         {/* Public Legal pages */}
         <Route element={<Layout />}>
@@ -75,6 +82,7 @@ export default function AppRouter() {
         <Route element={<GuestRoute />}>
           <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Route>
 
         {/* Protected routes (redirect to /login if not authenticated) */}

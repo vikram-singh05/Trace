@@ -36,60 +36,64 @@ const formStepVariants: Variants = {
   }
 };
 
-export default function Register() {
+export default function ForgotPassword() {
   const [step, setStep] = useState<1 | 2>(1);
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [otp, setOtp] = useState('');
   
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
-  const { register, verifyOtp } = useAuth();
+  const { forgotPassword, resetPassword } = useAuth();
 
-  const handleRegister = async (e: FormEvent) => {
+  const handleRequestOtp = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccessMsg('');
     setIsLoading(true);
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      await register({ name, email, password, confirmPassword });
+      await forgotPassword(email);
       setStep(2);
     } catch (err: any) {
       if (err?.error?.details?.length > 0) {
         setError(err.error.details[0].message);
       } else {
-        setError(err?.error?.message || 'Registration failed');
+        setError(err?.error?.message || 'Failed to request password reset');
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleVerifyOtp = async (e: FormEvent) => {
+  const handleResetPassword = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await verifyOtp(email, otp);
-      navigate('/dashboard');
+      await resetPassword({ email, otp, newPassword, confirmPassword });
+      setSuccessMsg('Password has been reset successfully. Redirecting to login...');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (err: any) {
       if (err?.error?.details?.length > 0) {
         setError(err.error.details[0].message);
       } else {
-        setError(err?.error?.message || 'Invalid verification code');
+        setError(err?.error?.message || 'Failed to reset password');
       }
     } finally {
       setIsLoading(false);
@@ -99,14 +103,12 @@ export default function Register() {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 sm:p-8 bg-earth-50 dark:bg-earth-950 overflow-hidden">
       
-      {/* ── Premium Liquid Glass Background ── */}
       <div className="premium-bg" />
 
       <div className="relative z-10 w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-earth-900/40 backdrop-blur-3xl backdrop-saturate-150">
         
         {/* ── Left Side: Branding ── */}
         <div className="hidden lg:flex lg:w-[45%] relative flex-col justify-end p-12 overflow-hidden border-r border-white/20 dark:border-white/5">
-          {/* Ambient Background Image */}
           <div className="absolute inset-0 bg-earth-950">
             <img 
               src="/trace_logo.jpg" 
@@ -114,7 +116,6 @@ export default function Register() {
               alt="Trace Ambient Background"
             />
           </div>
-          {/* Multi-layered gradient for depth and perfect readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-earth-950 via-earth-950/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-earth-950/80 via-transparent to-transparent" />
           
@@ -128,10 +129,10 @@ export default function Register() {
               </span>
             </Link>
             <h1 className="text-3xl xl:text-4xl font-bold text-white leading-tight">
-              Trace every lost item.
+              Reset Password
             </h1>
             <p className="text-earth-300 text-lg font-medium leading-relaxed">
-              Create an account with your email to join the secure intelligence network.
+              Don't worry, it happens to the best of us. Let's get you back in.
             </p>
           </div>
         </div>
@@ -175,7 +176,7 @@ export default function Register() {
               animate={{ opacity: 1, y: 0 }}
               className="text-3xl font-bold text-earth-900 dark:text-white mb-2"
             >
-              {step === 1 ? 'Create an Account' : 'Verify your email'}
+              {step === 1 ? 'Forgot Password?' : 'Create New Password'}
             </motion.h2>
             <motion.p 
               key={`p-${step}`}
@@ -184,8 +185,8 @@ export default function Register() {
               className="text-earth-600 dark:text-earth-400 text-sm mb-8 font-medium"
             >
               {step === 1 
-                ? 'Please fill in the information below to get started.' 
-                : 'We\'ve sent a 6-digit code to your email.'}
+                ? 'Enter your email address and we will send you a reset code.' 
+                : 'Enter the 6-digit code sent to your email and your new password.'}
             </motion.p>
 
             <AnimatePresence mode="wait">
@@ -200,6 +201,17 @@ export default function Register() {
                   <span>{error}</span>
                 </motion.div>
               )}
+              {successMsg && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 text-sm font-bold flex items-start gap-3"
+                >
+                  <ShieldCheck className="w-5 h-5 mt-0.5" />
+                  <span>{successMsg}</span>
+                </motion.div>
+              )}
             </AnimatePresence>
 
             <div className="relative w-full">
@@ -212,24 +224,8 @@ export default function Register() {
                     animate="animate"
                     exit="exit"
                     className="space-y-5 w-full" 
-                    onSubmit={handleRegister}
+                    onSubmit={handleRequestOtp}
                   >
-                    <div>
-                      <label className="block text-sm font-bold text-earth-700 dark:text-earth-300 mb-2">
-                        Full Name
-                      </label>
-                      <input
-                        id="name"
-                        type="text"
-                        autoComplete="name"
-                        required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="input-field py-4 text-base bg-white/80 dark:bg-earth-950/60 backdrop-blur-md border-earth-200 dark:border-earth-800/80 focus:border-gold-500 focus:ring-gold-500/20 transition-all rounded-2xl shadow-sm text-earth-900 dark:text-white placeholder-earth-400 dark:placeholder-earth-500"
-                        placeholder="e.g. Alex Chen"
-                      />
-                    </div>
-
                     <div>
                       <label className="block text-sm font-bold text-earth-700 dark:text-earth-300 mb-2">
                         Email Address
@@ -242,22 +238,68 @@ export default function Register() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="input-field py-4 text-base bg-white/80 dark:bg-earth-950/60 backdrop-blur-md border-earth-200 dark:border-earth-800/80 focus:border-gold-500 focus:ring-gold-500/20 transition-all rounded-2xl shadow-sm text-earth-900 dark:text-white placeholder-earth-400 dark:placeholder-earth-500"
-                        placeholder="alex@example.com"
+                        placeholder="you@example.com"
                       />
+                    </div>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full py-4 text-base font-bold text-white rounded-2xl bg-gradient-to-r from-gold-500 to-amber-600 shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2 group mt-6 hover:shadow-gold-500/30 transition-all border border-white/10"
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          Send Reset Code
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </motion.button>
+                  </motion.form>
+                ) : (
+                  <motion.form 
+                    key="step-2"
+                    variants={formStepVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    className="space-y-6 w-full" 
+                    onSubmit={handleResetPassword}
+                  >
+                    <div className="bg-white/50 dark:bg-earth-950/40 p-4 rounded-2xl border border-earth-200/50 dark:border-white/10 mb-6 flex items-start gap-3 shadow-inner backdrop-blur-md">
+                      <ShieldCheck className="w-6 h-6 text-gold-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm font-medium text-earth-700 dark:text-earth-300 leading-relaxed">
+                        Code sent to <span className="font-bold text-earth-900 dark:text-white">{email}</span>.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-earth-700 dark:text-earth-300 mb-3 text-center sm:text-left">
+                        Reset Code
+                      </label>
+                      <div className="flex justify-center sm:justify-start">
+                        <OtpInput length={6} value={otp} onChange={setOtp} />
+                      </div>
                     </div>
 
                     <div>
                       <label className="block text-sm font-bold text-earth-700 dark:text-earth-300 mb-2">
-                        Password
+                        New Password
                       </label>
                       <div className="relative">
                         <input
-                          id="password"
+                          id="newPassword"
                           type={showPassword ? 'text' : 'password'}
                           autoComplete="new-password"
                           required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
                           className="input-field py-4 pr-12 text-base bg-white/80 dark:bg-earth-950/60 backdrop-blur-md border-earth-200 dark:border-earth-800/80 focus:border-gold-500 focus:ring-gold-500/20 transition-all rounded-2xl shadow-sm text-earth-900 dark:text-white placeholder-earth-400 dark:placeholder-earth-500"
                           placeholder="••••••••"
                         />
@@ -273,7 +315,7 @@ export default function Register() {
 
                     <div>
                       <label className="block text-sm font-bold text-earth-700 dark:text-earth-300 mb-2">
-                        Confirm Password
+                        Confirm New Password
                       </label>
                       <div className="relative">
                         <input
@@ -300,63 +342,17 @@ export default function Register() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
-                      disabled={isLoading}
-                      className="w-full py-4 text-base font-bold text-white rounded-2xl bg-gradient-to-r from-gold-500 to-amber-600 shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2 group mt-6 hover:shadow-gold-500/30 transition-all border border-white/10"
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Creating account...
-                        </>
-                      ) : (
-                        <>
-                          Continue
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </motion.button>
-                  </motion.form>
-                ) : (
-                  <motion.form 
-                    key="step-2"
-                    variants={formStepVariants}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    className="space-y-6 w-full" 
-                    onSubmit={handleVerifyOtp}
-                  >
-                    <div className="bg-white/50 dark:bg-earth-950/40 p-4 rounded-2xl border border-earth-200/50 dark:border-white/10 mb-6 flex items-start gap-3 shadow-inner backdrop-blur-md">
-                      <ShieldCheck className="w-6 h-6 text-gold-500 flex-shrink-0 mt-0.5" />
-                      <p className="text-sm font-medium text-earth-700 dark:text-earth-300 leading-relaxed">
-                        Please check your inbox at <span className="font-bold text-earth-900 dark:text-white">{email}</span>.
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-bold text-earth-700 dark:text-earth-300 mb-3 text-center sm:text-left">
-                        Verification Code
-                      </label>
-                      <div className="flex justify-center sm:justify-start">
-                        <OtpInput length={6} value={otp} onChange={setOtp} />
-                      </div>
-                    </div>
-
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="submit"
                       disabled={isLoading || otp.length !== 6}
                       className="w-full py-4 text-base font-bold text-white rounded-2xl bg-gradient-to-r from-gold-500 to-amber-600 shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2 group mt-6 hover:shadow-gold-500/30 transition-all border border-white/10 disabled:opacity-50 disabled:pointer-events-none"
                     >
                       {isLoading ? (
                         <>
                           <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Verifying...
+                          Saving...
                         </>
                       ) : (
                         <>
-                          Verify Email
+                          Reset Password
                           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </>
                       )}
@@ -378,17 +374,16 @@ export default function Register() {
 
             <AnimatePresence>
               {step === 1 && (
-                <motion.p 
+                <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="mt-8 text-center text-sm text-earth-600 dark:text-earth-400 font-medium"
                 >
-                  Already have an account?{' '}
-                  <Link to="/login" className="font-bold text-gold-600 dark:text-gold-400 hover:text-gold-500 transition-colors ml-1">
-                    Sign in
+                  <Link to="/login" className="font-bold text-earth-500 hover:text-gold-500 transition-colors">
+                    Back to Login
                   </Link>
-                </motion.p>
+                </motion.div>
               )}
             </AnimatePresence>
           </motion.div>
