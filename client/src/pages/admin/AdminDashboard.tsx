@@ -98,16 +98,8 @@ function OverviewTab() {
     { title: 'Open Support Tickets', value: stats.openSupportTickets, icon: <MessageSquare className="w-6 h-6 text-red-500" />, border: 'border-red-500/30', bg: 'bg-red-500/10' },
   ];
 
-  // Mock data for advanced analytics visualization
-  const mockActivityData = [
-    { name: 'Mon', reports: 12, resolved: 4 },
-    { name: 'Tue', reports: 19, resolved: 7 },
-    { name: 'Wed', reports: 15, resolved: 10 },
-    { name: 'Thu', reports: 22, resolved: 12 },
-    { name: 'Fri', reports: 30, resolved: 18 },
-    { name: 'Sat', reports: 25, resolved: 15 },
-    { name: 'Sun', reports: 18, resolved: 9 },
-  ];
+  // Real data fetched from backend
+  const activityData = stats.activityData || [];
 
   return (
     <div className="space-y-6">
@@ -137,7 +129,7 @@ function OverviewTab() {
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={mockActivityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={activityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorReports" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#eab308" stopOpacity={0.3} />
@@ -169,7 +161,7 @@ function OverviewTab() {
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={mockActivityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={activityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="rgba(255,255,255,0.4)" fontSize={12} tickLine={false} axisLine={false} />
@@ -204,7 +196,26 @@ function UsersTab() {
 
   const toggleStatus = useMutation({
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) => adminApi.updateUserStatus(id, isActive),
-    onSuccess: () => {
+    onMutate: async ({ id, isActive }) => {
+      await queryClient.cancelQueries({ queryKey: ['adminUsers'] });
+      const previous = queryClient.getQueriesData({ queryKey: ['adminUsers'] });
+      queryClient.setQueriesData({ queryKey: ['adminUsers'] }, (old: any) => {
+        if (!old?.users) return old;
+        return {
+          ...old,
+          users: old.users.map((u: any) => u.id === id ? { ...u, isActive } : u)
+        };
+      });
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previous) {
+        context.previous.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
     },
   });
@@ -303,7 +314,32 @@ function ItemsTab() {
 
   const moderateItem = useMutation({
     mutationFn: ({ id, action }: { id: string; action: 'DELETE' | 'RESTORE' | 'HARD_DELETE' }) => adminApi.moderateItem(id, action),
-    onSuccess: () => {
+    onMutate: async ({ id, action }) => {
+      await queryClient.cancelQueries({ queryKey: ['adminItems'] });
+      const previous = queryClient.getQueriesData({ queryKey: ['adminItems'] });
+      queryClient.setQueriesData({ queryKey: ['adminItems'] }, (old: any) => {
+        if (!old?.items) return old;
+        if (action === 'HARD_DELETE') {
+          return {
+            ...old,
+            items: old.items.filter((i: any) => i.id !== id)
+          };
+        }
+        return {
+          ...old,
+          items: old.items.map((i: any) => i.id === id ? { ...i, deletedAt: action === 'DELETE' ? new Date().toISOString() : null } : i)
+        };
+      });
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previous) {
+        context.previous.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['adminItems'] });
     },
   });
@@ -409,14 +445,42 @@ function ReportsTab() {
 
   const updateReportStatus = useMutation({
     mutationFn: ({ id, status }: { id: string; status: 'REVIEWED' | 'DISMISSED' }) => reportApi.updateReportStatus(id, status),
-    onSuccess: () => {
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ['adminReports'] });
+      const previous = queryClient.getQueryData(['adminReports']);
+      queryClient.setQueryData(['adminReports'], (old: any) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((r: any) => r.id === id ? { ...r, status } : r);
+      });
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['adminReports'], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['adminReports'] });
     },
   });
 
   const toggleUserStatus = useMutation({
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) => adminApi.updateUserStatus(id, isActive),
-    onSuccess: () => {
+    onMutate: async ({ id, isActive }) => {
+      await queryClient.cancelQueries({ queryKey: ['adminReports'] });
+      const previous = queryClient.getQueryData(['adminReports']);
+      queryClient.setQueryData(['adminReports'], (old: any) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((r: any) => r.reportedUser.id === id ? { ...r, reportedUser: { ...r.reportedUser, isActive } } : r);
+      });
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['adminReports'], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['adminReports'] });
       queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
     },
@@ -557,7 +621,29 @@ function SupportTab() {
   const updateStatus = useMutation({
     mutationFn: ({ id, status, resolutionMessage }: { id: string; status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED'; resolutionMessage?: string }) =>
       adminApi.updateSupportTicketStatus(id, status, resolutionMessage),
-    onSuccess: () => {
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ['adminSupport'] });
+      const previous = queryClient.getQueriesData({ queryKey: ['adminSupport'] });
+      
+      queryClient.setQueriesData({ queryKey: ['adminSupport'] }, (old: any) => {
+        if (!old?.tickets) return old;
+        return {
+          ...old,
+          tickets: old.tickets.map((t: any) => 
+            t.id === id ? { ...t, status } : t
+          )
+        };
+      });
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previous) {
+        context.previous.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['adminSupport'] });
       queryClient.invalidateQueries({ queryKey: ['adminStats'] });
     },
@@ -727,7 +813,29 @@ function FeedbackTab() {
   const updateStatus = useMutation({
     mutationFn: ({ id, status, adminNote }: { id: string; status: string; adminNote?: string }) =>
       feedbackApi.updateStatus(id, status, adminNote),
-    onSuccess: () => {
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ['adminFeedbacks'] });
+      const previous = queryClient.getQueryData(['adminFeedbacks']);
+      queryClient.setQueryData(['adminFeedbacks'], (old: any) => {
+        if (!old?.data?.feedbacks) return old;
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            feedbacks: old.data.feedbacks.map((f: any) => 
+              f.id === id ? { ...f, status } : f
+            )
+          }
+        };
+      });
+      return { previous };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['adminFeedbacks'], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['adminFeedbacks'] });
     },
   });

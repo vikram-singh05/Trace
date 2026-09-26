@@ -1,631 +1,330 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import type { Variants } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   ShieldCheck,
-  Bell,
-  Camera,
-  LayoutGrid,
-  Users,
   ArrowRight,
   Zap,
-  Sparkles,
-  CheckCircle2,
-  RefreshCcw,
   Search,
-  MapPin,
-  Radio,
   Cpu,
-  Shield
+  Shield,
+  Activity,
+  Globe,
+  Users
 } from 'lucide-react';
 
-const StunningBackground = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    {/* Ultra-lightweight subtle grid */}
-    <div className="absolute inset-0 opacity-[0.03]" style={{ 
-      backgroundImage: `linear-gradient(rgba(255, 255, 255, 1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 1) 1px, transparent 1px)`,
-      backgroundSize: '40px 40px',
-      maskImage: 'radial-gradient(ellipse at 50% 0%, black 20%, transparent 80%)',
-      WebkitMaskImage: 'radial-gradient(ellipse at 50% 0%, black 20%, transparent 80%)'
-    }} />
-    
-    {/* GPU-accelerated static and CSS-pulsed glows instead of JS-driven framer motion arrays */}
-    <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#A09435] opacity-20 blur-[120px] animate-pulse-glow" />
-    <div className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#6B7C3E] opacity-10 blur-[120px]" />
-    <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[40%] rounded-full bg-[#B5A642] opacity-[0.15] blur-[140px]" />
-  </div>
-);
-
 export default function Landing() {
-  const [simulationState, setSimulationState] = useState<'idle' | 'scanning' | 'matched'>('idle');
   const { scrollYProgress } = useScroll();
   
-  // Parallax values - Subtler for smoother visual flow
-  const yText = useTransform(scrollYProgress, [0, 1], ['0%', '-15%']);
-  const yWidget = useTransform(scrollYProgress, [0, 1], ['0%', '10%']);
-  
-  const runSimulation = () => {
-    setSimulationState('scanning');
-    setTimeout(() => setSimulationState('matched'), 2500);
-  };
-
-  const features = [
-    {
-      icon: <Sparkles className="w-6 h-6" />,
-      title: 'Smart Matching',
-      description: 'AI-powered item matching with confidence scoring automatically connects lost and found reports.',
-      size: 'large' as const,
-    },
-    {
-      icon: <ShieldCheck className="w-5 h-5" />,
-      title: 'Secure Verification',
-      description: 'Secret verification questions ensure items are returned to their rightful owners.',
-      size: 'medium' as const,
-    },
-    {
-      icon: <Bell className="w-5 h-5" />,
-      title: 'Real-time Alerts',
-      description: 'Instant notifications when a match is found or a claim is submitted on your item.',
-      size: 'medium' as const,
-    },
-    {
-      icon: <Camera className="w-5 h-5" />,
-      title: 'Photo Evidence',
-      description: 'Upload multiple images to help identify items quickly and accurately.',
-      size: 'small' as const,
-    },
-    {
-      icon: <LayoutGrid className="w-5 h-5" />,
-      title: 'Smart Categories',
-      description: 'Organized by category for effortless browsing and searching.',
-      size: 'small' as const,
-    },
-    {
-      icon: <Users className="w-5 h-5" />,
-      title: 'Admin Moderation',
-      description: 'Dedicated admin tools keep the platform safe and organized.',
-      size: 'small' as const,
-    },
-  ];
-
-  // Variants for staggered entrance
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
-  };
-
-  const featureContainerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
-
-  const featureItemVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.95, y: 20 },
-    visible: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 200, damping: 20 } }
-  };
+  const yHeroText = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
+  const opacityHeroText = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
-    <div className="min-h-screen relative bg-black selection:bg-gold-500/30 overflow-hidden">
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-500 to-amber-500 origin-left z-50 shadow-[0_0_10px_rgba(212,175,55,0.3)]"
-        style={{ scaleX: scrollYProgress }}
-      />
-      <div className="premium-bg opacity-30" />
+    <div className="min-h-screen relative overflow-hidden bg-earth-50 dark:bg-earth-950 transition-colors duration-500 font-sans">
+      
+      {/* ── Immersive Background ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Central glowing orb for Hero */}
+        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80vw] max-w-[1000px] h-[600px] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gold-400/30 via-gold-500/5 to-transparent dark:from-gold-500/20 dark:via-gold-700/5 dark:to-transparent blur-3xl opacity-70" />
+        
+        {/* Subtle dot pattern */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+      </div>
 
       {/* ═══════════════════════════════════════
-          NEW HERO SECTION (Framer Motion)
+          CENTERED HERO SECTION
          ═══════════════════════════════════════ */}
-      <section className="relative min-h-[95vh] flex flex-col justify-center pt-24 pb-16">
-        {/* Stunning Visual Background Effect */}
-        <StunningBackground />
-
-        <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 w-full relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-          
-          {/* Left Text Content */}
-          <motion.div 
-            style={{ y: yText }}
-            className="flex-1 text-center lg:text-left mt-10 lg:mt-0"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.div 
-              variants={itemVariants}
-              className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-gold-500/30 bg-gold-500/10 backdrop-blur-sm"
-            >
-              <motion.span 
-                animate={{ opacity: [1, 0.4, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="w-2 h-2 rounded-full bg-gold-500" 
-              />
-              <span className="text-[11px] font-extrabold uppercase tracking-widest text-gold-500">
-                Intelligence Network
-              </span>
-            </motion.div>
-
-            <motion.h1 variants={itemVariants} className="text-6xl sm:text-7xl lg:text-[5.5rem] font-black tracking-tight leading-[1.05] text-white">
-              Find what you<br />
-              lost.<br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] via-[#FEF08A] to-[#A09435] relative inline-block drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]">
-                Instantly.
-                <motion.span 
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ delay: 1, duration: 0.8, ease: "circOut" }}
-                  className="absolute bottom-2 left-0 h-2 bg-[#D4AF37]/30 -z-10 rounded-full"
-                />
-              </span>
-            </motion.h1>
-
-            <motion.p variants={itemVariants} className="text-earth-400 text-lg sm:text-xl mt-8 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
-              Trace is the centralized, AI-assisted lost and found network for your community. Report items in seconds and let our matching engine do the rest.
-            </motion.p>
-
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-5 mt-10">
-              <Link to="/register" className="w-full sm:w-auto block">
-                <motion.div
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="relative group bg-gradient-to-r from-[#B5A642] to-[#8A7E2A] text-black font-extrabold px-8 py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(181,166,66,0.3)] overflow-hidden"
-                >
-                  <span className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-500 -translate-x-full skew-x-12 pointer-events-none" />
-                  <span className="relative flex items-center gap-2">Join the Network <ArrowRight className="w-5 h-5" /></span>
-                </motion.div>
-              </Link>
-              <Link to="/items" className="w-full sm:w-auto block">
-                <motion.div
-                  whileHover={{ scale: 1.03, backgroundColor: "rgba(255,255,255,0.1)" }}
-                  whileTap={{ scale: 0.97 }}
-                  className="bg-white/5 border border-white/10 text-white font-bold px-8 py-4 rounded-xl flex items-center justify-center gap-2 backdrop-blur-sm"
-                >
-                  <Search className="w-5 h-5 opacity-70" /> Browse Database
-                </motion.div>
-              </Link>
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-8 mt-12">
-              <div className="flex items-center gap-2 text-earth-300 font-bold text-sm">
-                <Users className="w-4 h-4 opacity-50" /> 12k+ Users
-              </div>
-              <div className="flex items-center gap-2 text-earth-300 font-bold text-sm">
-                <CheckCircle2 className="w-4 h-4 opacity-50" /> 4.8k+ Items Returned
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Right Interactive Widget */}
-          <motion.div 
-            style={{ y: yWidget }}
-            initial={{ opacity: 0, x: 40, rotateY: -5 }}
-            animate={{ opacity: 1, x: 0, rotateY: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 100 }}
-            className="flex-1 w-full max-w-lg lg:max-w-xl perspective-1000"
-          >
-            <motion.div 
-              whileHover={{ rotateY: -3, rotateX: 3, scale: 1.01 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="relative group"
-            >
-              {/* Animated Glow Behind Widget */}
-              <motion.div 
-                animate={{ 
-                  backgroundColor: simulationState === 'scanning' ? 'rgba(99, 102, 241, 0.4)' 
-                                 : simulationState === 'matched' ? 'rgba(234, 179, 8, 0.4)' 
-                                 : 'rgba(255, 255, 255, 0.05)'
-                }}
-                className="absolute -inset-1 rounded-3xl blur-xl transition-all duration-1000" 
-              />
-              
-              <div className="relative rounded-3xl bg-[#0a0a0a] border border-[#1a1a1a] shadow-2xl overflow-hidden flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between px-5 py-3 border-b border-[#1a1a1a] bg-black/50 backdrop-blur-md z-20">
-                  <div className="flex items-center gap-2 font-mono text-[10px] text-earth-500 tracking-wider">
-                    <Radio className="w-3.5 h-3.5" /> matcher.service
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-earth-400 uppercase tracking-widest">
-                    <motion.span 
-                      animate={{ 
-                        backgroundColor: simulationState === 'scanning' ? '#6366f1' : simulationState === 'matched' ? '#eab308' : '#10b981',
-                        scale: simulationState === 'scanning' ? [1, 1.5, 1] : 1
-                      }}
-                      transition={simulationState === 'scanning' ? { repeat: Infinity, duration: 1 } : {}}
-                      className="w-1.5 h-1.5 rounded-full" 
-                    />
-                    Active
-                  </div>
-                </div>
-
-                {/* Body */}
-                <div className="p-6 relative">
-                  
-                  {/* Radar Scanning Effect using Framer Motion */}
-                  <AnimatePresence>
-                    {simulationState === 'scanning' && (
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden pointer-events-none"
-                      >
-                        {[0, 1, 2].map((i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ scale: 0, opacity: 0.8 }}
-                            animate={{ scale: 2, opacity: 0 }}
-                            transition={{ 
-                              duration: 1.5, 
-                              repeat: Infinity, 
-                              delay: i * 0.4,
-                              ease: "easeOut" 
-                            }}
-                            className="absolute w-[200px] h-[200px] border border-indigo-500/60 rounded-full"
-                          />
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Target Item */}
-                  <div className="relative z-10 flex justify-between items-start mb-6 h-[72px]">
-                    <div>
-                      <span className="text-[10px] font-extrabold text-earth-500 tracking-widest uppercase mb-1 block">Lost Item</span>
-                      <h3 className="text-xl font-bold text-white mb-0.5">Apple AirPods Pro</h3>
-                      <p className="text-sm text-earth-400">Left bud missing</p>
-                    </div>
-                    
-                    <AnimatePresence mode="wait">
-                      {simulationState === 'matched' && (
-                        <motion.div 
-                          key="matched"
-                          initial={{ opacity: 0, y: -20, scale: 0.8 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          transition={{ type: "spring", bounce: 0.6 }}
-                          className="text-right"
-                        >
-                          <div className="text-3xl font-black text-gold-500 tracking-tight">98.4%</div>
-                          <div className="text-[10px] font-extrabold text-earth-500 uppercase tracking-widest">Match Score</div>
-                        </motion.div>
-                      )}
-                      {simulationState === 'scanning' && (
-                        <motion.div 
-                          key="scanning"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="text-right"
-                        >
-                          <motion.div 
-                            animate={{ opacity: [1, 0.3, 1] }}
-                            transition={{ duration: 0.8, repeat: Infinity }}
-                            className="text-3xl font-black text-indigo-400 tracking-tight font-mono"
-                          >
-                            --.-%
-                          </motion.div>
-                          <div className="text-[10px] font-extrabold text-earth-500 uppercase tracking-widest">Analyzing</div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Match Card */}
-                  <motion.div 
-                    layout
-                    animate={{
-                      backgroundColor: simulationState === 'matched' ? '#12110c' : '#111111',
-                      borderColor: simulationState === 'matched' ? 'rgba(234, 179, 8, 0.3)' : 'rgba(255,255,255,0.05)',
-                      boxShadow: simulationState === 'matched' ? '0 0 30px rgba(234,179,8,0.1)' : 'none',
-                      filter: simulationState === 'idle' ? 'grayscale(100%) opacity(40%)' : simulationState === 'scanning' ? 'grayscale(50%) opacity(70%)' : 'grayscale(0%) opacity(100%)'
-                    }}
-                    transition={{ duration: 0.5 }}
-                    className="relative z-10 rounded-2xl border"
-                  >
-                    <div className="p-4 flex gap-4">
-                      <motion.div 
-                        animate={{
-                          backgroundColor: simulationState === 'matched' ? '#eab308' : '#292524'
-                        }}
-                        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                      >
-                        <MapPin className={`w-6 h-6 ${simulationState === 'matched' ? 'text-black' : 'text-earth-500'}`} />
-                      </motion.div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-1">
-                          <h4 className="font-bold text-white text-sm">Found: White Earbuds</h4>
-                          <AnimatePresence>
-                            {simulationState === 'matched' && (
-                              <motion.span 
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="text-[9px] font-bold uppercase tracking-wider text-gold-400 bg-gold-400/10 px-2 py-0.5 rounded-full border border-gold-400/20"
-                              >
-                                New
-                              </motion.span>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                        <p className="text-xs text-earth-400 mb-3">Found in Science Library, 3rd Floor</p>
-                        
-                        <div className="flex flex-wrap gap-2">
-                          <motion.div 
-                            animate={{
-                              backgroundColor: simulationState === 'matched' ? '#1a1705' : 'rgba(0,0,0,0.5)',
-                              borderColor: simulationState === 'matched' ? 'rgba(234, 179, 8, 0.2)' : 'rgba(255,255,255,0.05)',
-                              color: simulationState === 'matched' ? '#eab308' : '#57534E'
-                            }}
-                            className="text-[10px] font-bold px-2 py-1 rounded border flex items-center gap-1"
-                          >
-                            {simulationState === 'matched' && <CheckCircle2 className="w-3 h-3" />} Location Match
-                          </motion.div>
-                          <motion.div 
-                            animate={{
-                              backgroundColor: simulationState === 'matched' ? '#1a1705' : 'rgba(0,0,0,0.5)',
-                              borderColor: simulationState === 'matched' ? 'rgba(234, 179, 8, 0.2)' : 'rgba(255,255,255,0.05)',
-                              color: simulationState === 'matched' ? '#eab308' : '#57534E'
-                            }}
-                            className="text-[10px] font-bold px-2 py-1 rounded border flex items-center gap-1"
-                          >
-                            {simulationState === 'matched' && <CheckCircle2 className="w-3 h-3" />} Time Match
-                          </motion.div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  <motion.button 
-                    whileHover={simulationState !== 'scanning' ? { scale: 1.02, backgroundColor: "rgba(255,255,255,0.1)" } : {}}
-                    whileTap={simulationState !== 'scanning' ? { scale: 0.98 } : {}}
-                    onClick={runSimulation}
-                    disabled={simulationState === 'scanning'}
-                    className="w-full mt-6 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white flex items-center justify-center gap-2 relative overflow-hidden"
-                  >
-                    {simulationState === 'scanning' && (
-                      <motion.div 
-                        initial={{ x: '-100%' }}
-                        animate={{ x: '100%' }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent skew-x-12"
-                      />
-                    )}
-                    <RefreshCcw className={`w-3.5 h-3.5 ${simulationState === 'scanning' ? 'animate-spin' : ''}`} /> 
-                    {simulationState === 'scanning' ? 'Scanning Database...' : simulationState === 'matched' ? 'Restart Simulation' : 'Run Simulation'}
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-
-        </div>
-
-        {/* Powered By Bottom Banner */}
+      <section className="relative z-10 pt-32 pb-10 flex flex-col items-center text-center px-6">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-          className="absolute bottom-6 left-0 w-full text-center"
+          style={{ y: yHeroText, opacity: opacityHeroText }}
+          className="max-w-4xl mx-auto flex flex-col items-center"
         >
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-earth-600 mb-3">Powered By</p>
-          <div className="flex justify-center items-center gap-6 sm:gap-10 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-            <motion.div whileHover={{ scale: 1.1, color: "#61dafb" }} className="flex items-center gap-1.5 font-bold text-white text-sm cursor-default"><Cpu className="w-5 h-5"/> React</motion.div>
-            <motion.div whileHover={{ scale: 1.1, color: "#646cff" }} className="flex items-center gap-1.5 font-bold text-white text-sm cursor-default"><Zap className="w-5 h-5"/> Vite</motion.div>
-            <motion.div whileHover={{ scale: 1.1, color: "#38bdf8" }} className="flex items-center gap-1.5 font-bold text-white text-sm cursor-default"><LayoutGrid className="w-5 h-5"/> Tailwind</motion.div>
-            <motion.div whileHover={{ scale: 1.1, color: "#3ecf8e" }} className="flex items-center gap-1.5 font-bold text-white text-sm cursor-default"><Shield className="w-5 h-5"/> ImageKit</motion.div>
-          </div>
+          {/* Badge */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full border border-earth-300 dark:border-earth-700 bg-white/50 dark:bg-earth-900/50 backdrop-blur-xl shadow-sm"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gold-500"></span>
+            </span>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-earth-800 dark:text-earth-200">
+              Trace Network v2.0
+            </span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+            className="text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tight leading-[1.05] text-earth-900 dark:text-white mb-6"
+          >
+            Lost it? <br className="hidden md:block" />
+            <span className="relative inline-block mt-2">
+              <span className="absolute -inset-2 bg-gradient-to-r from-gold-400/20 to-gold-600/20 blur-xl rounded-full" />
+              <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-gold-500 via-yellow-400 to-gold-600 dark:from-gold-300 dark:via-gold-400 dark:to-gold-600 drop-shadow-sm">
+                We'll track it.
+              </span>
+            </span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="text-lg md:text-xl text-earth-600 dark:text-earth-400 max-w-2xl font-medium leading-relaxed mb-10"
+          >
+            The centralized, AI-powered lost and found network for modern campuses. 
+            Report items in seconds and let our semantic matching engine do the rest.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+          >
+            <Link to="/register" className="w-full sm:w-auto">
+              <button className="h-14 px-8 rounded-2xl font-bold text-white bg-earth-900 dark:bg-white dark:text-earth-900 hover:scale-105 transition-transform flex items-center justify-center gap-2 w-full shadow-xl shadow-earth-900/10 dark:shadow-white/10">
+                Join the Network <ArrowRight className="w-5 h-5" />
+              </button>
+            </Link>
+            <Link to="/items" className="w-full sm:w-auto">
+              <button className="h-14 px-8 rounded-2xl font-bold text-earth-900 dark:text-white bg-white dark:bg-earth-800 border border-earth-200 dark:border-earth-700 hover:bg-earth-100 dark:hover:bg-earth-700 hover:scale-105 transition-all flex items-center justify-center gap-2 w-full">
+                <Search className="w-5 h-5 opacity-70" /> Browse Database
+              </button>
+            </Link>
+          </motion.div>
+
+          {/* Trust / Stats Bar */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="mt-16 pt-8 border-t border-earth-200/50 dark:border-earth-800/50 flex flex-wrap justify-center gap-8 md:gap-16 w-full"
+          >
+            <div className="flex flex-col items-center">
+              <span className="text-3xl font-black text-earth-900 dark:text-white">2k+</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-earth-500">Items Found</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-3xl font-black text-earth-900 dark:text-white">98%</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-earth-500">Return Rate</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-3xl font-black text-earth-900 dark:text-white">24/7</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-earth-500">Moderation</span>
+            </div>
+          </motion.div>
         </motion.div>
       </section>
 
       {/* ═══════════════════════════════════════
-          FEATURES SECTION
+          HOW IT WORKS
          ═══════════════════════════════════════ */}
-      <section className="section-padding relative bg-[#0a0a0a] border-t border-white/5">
+      <section className="py-24 relative z-10 bg-earth-50/50 dark:bg-earth-950/50">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          {/* Section Header */}
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={containerVariants}
-            className="max-w-lg mb-16"
-          >
-            <motion.span variants={itemVariants} className="w-12 h-1 bg-gold-500 rounded-full block mb-6" />
-            <motion.h2 variants={itemVariants} className="text-4xl font-black text-white tracking-tight">
-              Built for the modern world
-            </motion.h2>
-            <motion.p variants={itemVariants} className="text-earth-400 text-lg mt-4 font-medium">
-              Every feature is designed with security, speed, and simplicity in mind
-              — so you can focus on what matters.
-            </motion.p>
-          </motion.div>
-
-          {/* Feature Grid */}
-          <motion.div 
-            variants={featureContainerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-          >
-            {features.map((feature) => (
-              <motion.div
-                key={feature.title}
-                variants={featureItemVariants}
-                whileHover={{ 
-                  y: -4, 
-                  borderColor: "rgba(212,175,55,0.25)",
-                  boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)"
-                }}
-                className={`relative group overflow-hidden transition-all duration-300 ${feature.size === 'large'
-                  ? 'md:col-span-2 lg:col-span-2 bg-[#111] border border-white/5 rounded-3xl p-8 sm:p-10'
-                  : feature.size === 'medium'
-                    ? 'bg-[#111] border border-white/5 rounded-3xl p-7'
-                    : 'bg-[#111] border border-white/5 rounded-3xl p-6'
-                  }`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/0 via-transparent to-[#D4AF37]/0 group-hover:from-[#D4AF37]/5 group-hover:to-transparent transition-colors duration-500 z-0" />
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                  className={`relative z-10 flex items-center justify-center rounded-2xl mb-5 transition-colors duration-300 ${feature.size === 'large'
-                    ? 'w-14 h-14 bg-gold-500/10 text-gold-500 group-hover:bg-gold-500/20 group-hover:text-gold-400'
-                    : 'w-11 h-11 bg-white/5 text-earth-300 group-hover:text-gold-400 group-hover:bg-gold-500/15'
-                    }`}
-                >
-                  {feature.icon}
-                </motion.div>
-                <h3
-                  className={`relative z-10 font-bold text-white transition-colors duration-300 group-hover:text-gold-400 ${feature.size === 'large' ? 'text-2xl' : 'text-lg'
-                    }`}
-                >
-                  {feature.title}
-                </h3>
-                <p
-                  className={`relative z-10 text-earth-400 mt-2 font-medium transition-colors duration-300 group-hover:text-earth-300 ${feature.size === 'large' ? 'max-w-md' : 'text-sm'
-                    }`}
-                >
-                  {feature.description}
-                </p>
-              </motion.div>
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-black text-earth-900 dark:text-white tracking-tight mb-4">
+              Three steps to recover.
+            </h2>
+            <p className="text-earth-500 dark:text-earth-400">
+              A simple, secure process to get your valuables back.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {/* Connecting Line for Desktop */}
+            <div className="hidden md:block absolute top-12 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-earth-200 via-earth-300 to-earth-200 dark:from-earth-800 dark:via-earth-700 dark:to-earth-800 z-0" />
+            
+            {[
+              { icon: <Search className="w-6 h-6 text-blue-500" />, title: "1. Report", desc: "Log a detailed report of the lost or found item." },
+              { icon: <ShieldCheck className="w-6 h-6 text-emerald-500" />, title: "2. Verify", desc: "Use secret questions to securely verify ownership." },
+              { icon: <Users className="w-6 h-6 text-gold-500" />, title: "3. Reconnect", desc: "Meet up safely and return the item to its owner." }
+            ].map((step, i) => (
+              <div key={i} className="relative z-10 flex flex-col items-center text-center">
+                <div className="w-24 h-24 rounded-full bg-white dark:bg-earth-900 border-4 border-earth-50 dark:border-earth-950 shadow-xl flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-earth-50 dark:bg-black/50 flex items-center justify-center">
+                    {step.icon}
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-earth-900 dark:text-white mb-2">{step.title}</h3>
+                <p className="text-earth-600 dark:text-earth-400 max-w-xs">{step.desc}</p>
+              </div>
             ))}
-          </motion.div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* ═══════════════════════════════════════
+          BENTO GRID SECTION
+         ═══════════════════════════════════════ */}
+      <section className="py-24 relative bg-white dark:bg-[#0a0a0a] border-t border-earth-200 dark:border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl md:text-5xl font-black text-earth-900 dark:text-white tracking-tight mb-4">
+              Everything you need to run a modern campus network.
+            </h2>
+            <p className="text-lg text-earth-500 dark:text-earth-400">
+              A complete toolkit combining semantic search, secure verification, and administrative controls.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 auto-rows-[250px]">
+            
+            {/* Bento 1: Large Database Feature */}
+            <div className="md:col-span-2 md:row-span-2 rounded-[2rem] bg-gradient-to-br from-earth-50 to-earth-100 dark:from-earth-900/50 dark:to-earth-900 p-8 flex flex-col relative overflow-hidden border border-earth-200 dark:border-earth-800 group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-[80px] group-hover:bg-blue-400/20 transition-colors duration-500" />
+              <div className="w-14 h-14 rounded-2xl bg-white dark:bg-black/50 shadow-sm flex items-center justify-center mb-6 border border-earth-100 dark:border-earth-700">
+                <Search className="w-7 h-7 text-blue-500" />
+              </div>
+              <h3 className="text-3xl font-bold text-earth-900 dark:text-white mb-3">Unified Campus Database</h3>
+              <p className="text-earth-600 dark:text-earth-400 text-lg max-w-md">
+                A single, centralized platform for all lost and found items. Easily report, track, and manage items across the entire network in real-time.
+              </p>
+              
+              <div className="mt-auto relative z-10 flex flex-col gap-3 overflow-hidden pt-8">
+                 <div className="bg-white/80 dark:bg-black/50 backdrop-blur-md p-4 rounded-xl border border-earth-200 dark:border-earth-700 shadow-xl w-[90%] flex items-center justify-between transform -translate-x-4 group-hover:translate-x-0 transition-transform duration-500">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <Search className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <span className="font-semibold text-sm text-earth-900 dark:text-white">Lost AirPods Pro</span>
+                    </div>
+                    <span className="text-[10px] uppercase font-bold text-earth-400">2 mins ago</span>
+                 </div>
+                 
+                 <div className="bg-white/80 dark:bg-black/50 backdrop-blur-md p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 shadow-xl w-[90%] self-end flex items-center justify-between transform translate-x-4 group-hover:translate-x-0 transition-transform duration-500 delay-75">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                        <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <span className="font-semibold text-sm text-earth-900 dark:text-white">Found White Earbuds</span>
+                    </div>
+                    <span className="text-[10px] uppercase font-bold text-emerald-500">Just Now</span>
+                 </div>
+              </div>
+            </div>
+
+            {/* Bento 2: Verification */}
+            <div className="rounded-[2rem] bg-earth-50 dark:bg-earth-900/30 p-8 flex flex-col border border-earth-200 dark:border-earth-800 hover:border-earth-300 dark:hover:border-earth-700 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-white dark:bg-black/50 shadow-sm flex items-center justify-center mb-4 border border-earth-100 dark:border-earth-700">
+                <ShieldCheck className="w-6 h-6 text-emerald-500" />
+              </div>
+              <h3 className="text-xl font-bold text-earth-900 dark:text-white mb-2">Secret Verification</h3>
+              <p className="text-earth-600 dark:text-earth-400 text-sm">
+                Finders set secret questions that only the true owner can answer.
+              </p>
+              <div className="mt-auto bg-white/60 dark:bg-black/20 p-3 rounded-lg border border-earth-200 dark:border-earth-800 text-xs text-earth-500 font-medium">
+                Q: What is the lock screen wallpaper?
+              </div>
+            </div>
+
+            {/* Bento 3: Admin */}
+            <div className="rounded-[2rem] bg-earth-50 dark:bg-earth-900/30 p-8 flex flex-col border border-earth-200 dark:border-earth-800 hover:border-earth-300 dark:hover:border-earth-700 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-white dark:bg-black/50 shadow-sm flex items-center justify-center mb-4 border border-earth-100 dark:border-earth-700">
+                <Activity className="w-6 h-6 text-blue-500" />
+              </div>
+              <h3 className="text-xl font-bold text-earth-900 dark:text-white mb-2">Admin Portal</h3>
+              <p className="text-earth-600 dark:text-earth-400 text-sm">
+                Dedicated dashboard to moderate items, ban users, and resolve support tickets.
+              </p>
+            </div>
+
+          </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════
-          CTA SECTION
+          MARQUEE & CTA
          ═══════════════════════════════════════ */}
-      <section className="section-padding relative bg-black">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="py-24 relative bg-earth-900 dark:bg-black overflow-hidden">
+        
+        {/* Infinite Marquee */}
+        <div className="absolute top-0 left-0 w-full h-16 bg-gold-500 flex items-center overflow-hidden border-b-4 border-gold-600">
           <motion.div 
-            initial={{ opacity: 0, y: 100, scale: 0.9 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ type: "spring", stiffness: 80, damping: 20 }}
-            className="bg-[#0a0a0a] border border-white/5 p-10 sm:p-16 lg:p-20 relative overflow-hidden text-center rounded-[3rem] shadow-[0_0_100px_rgba(212,175,55,0.05)] hover:border-white/10 transition-colors duration-500"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+            className="flex whitespace-nowrap text-earth-900 font-black uppercase tracking-widest text-lg items-center gap-10"
           >
-            {/* Lightweight Static Gradients */}
-            <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-gold-500/10 blur-[100px] pointer-events-none" />
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-indigo-500/5 blur-[100px] pointer-events-none" />
-
-            <div className="relative z-10">
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <Zap className="w-5 h-5 text-gold-500" />
-                <span className="text-xs font-extrabold tracking-widest uppercase text-gold-500">
-                  Join Your Community
-                </span>
-              </div>
-
-              <h2 className="text-4xl sm:text-5xl font-black text-white max-w-2xl mx-auto tracking-tight">
-                Ready to make your community a better place?
-              </h2>
-
-              <p className="text-earth-400 text-lg mt-6 max-w-xl mx-auto font-medium">
-                Join thousands of users already using Trace to help each
-                other recover lost belongings.
-              </p>
-
-              <div className="flex justify-center mt-10">
-                <Link to="/register" className="block">
-                  <motion.div 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="relative group bg-gradient-to-r from-[#B5A642] to-[#8A7E2A] text-black font-extrabold px-10 py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_0_40px_rgba(181,166,66,0.3)] overflow-hidden"
-                  >
-                    <span className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-500 -translate-x-full skew-x-12 pointer-events-none" />
-                    <span className="relative flex items-center gap-2">Create Free Account <ArrowRight className="w-5 h-5" /></span>
-                  </motion.div>
-                </Link>
-              </div>
-
-              {/* Trust indicators */}
-              <div className="flex flex-wrap justify-center gap-6 mt-12">
-                {['Secure & Private', 'Community Verified', 'Always Free'].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm font-bold text-earth-500">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <span key={i} className="flex items-center gap-10">
+                <span>Fast Resolution</span> <Zap className="w-5 h-5" />
+                <span>Secure Platform</span> <Shield className="w-5 h-5" />
+                <span>Community Driven</span> <Globe className="w-5 h-5" />
+              </span>
+            ))}
           </motion.div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-6 text-center pt-20 relative z-10">
+          <h2 className="text-5xl font-black text-white mb-6 tracking-tight">
+            Ready to trace your items?
+          </h2>
+          <p className="text-earth-400 text-lg mb-10">
+            Join the community today and experience the smartest way to recover lost belongings.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link to="/register">
+              <button className="h-14 px-10 rounded-full font-black text-earth-900 bg-white hover:bg-earth-100 transition-colors w-full sm:w-auto text-lg shadow-2xl shadow-white/10">
+                Create Free Account
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════
           FOOTER
          ═══════════════════════════════════════ */}
-      <footer className="border-t border-white/5 bg-black">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="py-16 grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
-            <div className="md:col-span-5">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-9 h-9 rounded-xl overflow-hidden border border-earth-700/50 flex items-center justify-center shadow-[0_0_20px_rgba(234,179,8,0.3)]">
-                  <img src="/trace_logo.jpg" alt="Logo" className="w-full h-full object-cover scale-110" />
+      <footer className="border-t border-earth-200/10 bg-earth-950 dark:bg-[#050505]">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-10">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl overflow-hidden border border-earth-800 flex items-center justify-center bg-black">
+                  <img src="/trace_logo.jpg" alt="Logo" className="w-full h-full object-cover" />
                 </div>
-                <span className="text-lg font-bold text-white tracking-tight">
-                  Trace
-                </span>
+                <span className="font-bold text-white text-xl">Trace Network</span>
               </div>
-              <p className="text-sm text-earth-500 font-medium leading-relaxed max-w-sm">
-                The secure, intelligent lost-and-found platform designed for communities. 
-                Helping people reunite with what matters most.
+              <p className="text-earth-500 text-sm max-w-xs">
+                The secure, intelligent lost-and-found platform designed for communities.
               </p>
             </div>
-
-            <div className="md:col-span-3">
-              <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-earth-600 mb-5">
-                Platform
-              </h4>
-              <ul className="space-y-3">
-                {[
-                  { name: 'Sign In', path: '/login' },
-                  { name: 'Create Account', path: '/register' },
-                ].map((link) => (
-                  <li key={link.path}>
-                    <Link
-                      to={link.path}
-                      className="inline-block text-sm font-bold text-earth-400 hover:text-gold-500 hover:translate-x-2 transition-all duration-300"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="md:col-span-4">
-              <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-earth-600 mb-5">
-                Legal
-              </h4>
-              <ul className="space-y-3">
-                {['Terms of Service', 'Privacy Policy', 'Accessibility'].map((item) => (
-                  <li key={item}>
-                    <a href="#" className="inline-block text-sm font-bold text-earth-400 hover:text-gold-500 hover:translate-x-2 transition-all duration-300">
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+            
+            <div className="flex gap-16">
+              <div>
+                <h4 className="text-white font-bold mb-4">Platform</h4>
+                <div className="flex flex-col gap-2">
+                  <Link to="/login" className="text-earth-500 hover:text-white transition-colors text-sm">Sign In</Link>
+                  <Link to="/register" className="text-earth-500 hover:text-white transition-colors text-sm">Create Account</Link>
+                  <Link to="/items" className="text-earth-500 hover:text-white transition-colors text-sm">Database</Link>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-white font-bold mb-4">Legal</h4>
+                <div className="flex flex-col gap-2">
+                  <a href="#" className="text-earth-500 hover:text-white transition-colors text-sm">Terms</a>
+                  <a href="#" className="text-earth-500 hover:text-white transition-colors text-sm">Privacy</a>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div className="border-t border-white/5 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-[11px] text-earth-600 font-bold uppercase tracking-wider">
-              © {new Date().getFullYear()} Trace. Designed for communities.
-            </p>
+          
+          <div className="mt-16 pt-8 border-t border-earth-800/50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-xs text-earth-500 font-medium">
+              © {new Date().getFullYear()} Trace. All rights reserved.
+            </div>
+            <div className="flex items-center gap-4 text-earth-600">
+               <Cpu className="w-4 h-4 hover:text-white transition-colors cursor-pointer" />
+               <Globe className="w-4 h-4 hover:text-white transition-colors cursor-pointer" />
+            </div>
           </div>
         </div>
       </footer>

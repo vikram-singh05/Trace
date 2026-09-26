@@ -103,10 +103,10 @@ export default function Support() {
         itemId: type === 'PROBLEM' ? prefilledItemId : undefined,
       });
 
-      setReportId(res.feedback.id);
+      setReportId(res.data.feedback.id);
       setSuccess(true);
       setTimeout(() => {
-        navigate('/');
+        navigate('/dashboard');
       }, 3000);
     } catch (err: any) {
       setError(err?.error?.message || 'Failed to submit report. Please try again.');

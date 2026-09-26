@@ -7,6 +7,11 @@ export interface AdminStats {
   resolvedItems: number;
   totalMatches: number;
   openSupportTickets: number;
+  activityData?: {
+    name: string;
+    reports: number;
+    resolved: number;
+  }[];
 }
 
 export interface User {

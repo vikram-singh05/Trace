@@ -9,12 +9,41 @@ export const getStats = async () => {
     prisma.supportTicket.count({ where: { status: 'OPEN' } }),
   ]);
 
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const now = new Date();
+  
+  const activityData = [];
+  for (let i = 6; i >= 0; i--) {
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i + 1);
+    
+    const [
+      feedbackCreated, ticketCreated, reportCreated,
+      feedbackResolved, ticketResolved, reportResolved
+    ] = await Promise.all([
+      prisma.feedbackReport.count({ where: { createdAt: { gte: startOfDay, lt: endOfDay } } }),
+      prisma.supportTicket.count({ where: { createdAt: { gte: startOfDay, lt: endOfDay } } }),
+      prisma.userReport.count({ where: { createdAt: { gte: startOfDay, lt: endOfDay } } }),
+      
+      prisma.feedbackReport.count({ where: { updatedAt: { gte: startOfDay, lt: endOfDay }, status: { in: ['RESOLVED', 'CLOSED'] } } }),
+      prisma.supportTicket.count({ where: { updatedAt: { gte: startOfDay, lt: endOfDay }, status: 'RESOLVED' } }),
+      prisma.userReport.count({ where: { updatedAt: { gte: startOfDay, lt: endOfDay }, status: { in: ['REVIEWED', 'DISMISSED'] } } }),
+    ]);
+
+    activityData.push({
+      name: days[startOfDay.getDay()],
+      reports: feedbackCreated + ticketCreated + reportCreated,
+      resolved: feedbackResolved + ticketResolved + reportResolved,
+    });
+  }
+
   return {
     totalUsers,
     activeItems,
     resolvedItems,
     totalMatches,
     openSupportTickets,
+    activityData,
   };
 };
 
