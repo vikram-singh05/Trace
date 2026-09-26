@@ -250,7 +250,7 @@ export default function Navbar() {
                             <Link
                               to="/admin"
                               onClick={() => setIsProfileOpen(false)}
-                              className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-white/80 dark:hover:bg-earth-800/50 transition-colors select-none"
+                              className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-earth-100/50 dark:hover:bg-white/[0.04] transition-colors select-none"
                             >
                               <Shield className="w-4 h-4 text-earth-900 dark:text-earth-100" />
                               Admin Portal
@@ -261,7 +261,7 @@ export default function Navbar() {
                           <Link
                             to="/dashboard"
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-white/80 dark:hover:bg-earth-800/50 transition-colors select-none"
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-earth-100/50 dark:hover:bg-white/[0.04] transition-colors select-none"
                           >
                             <LayoutDashboard className="w-4 h-4 text-gold-500" />
                             Dashboard
@@ -271,7 +271,7 @@ export default function Navbar() {
                           <Link
                             to="/my-feedback"
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-white/80 dark:hover:bg-earth-800/50 transition-colors select-none"
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-earth-100/50 dark:hover:bg-white/[0.04] transition-colors select-none"
                           >
                             <FileText className="w-4 h-4 text-earth-500" />
                             My Feedback History
@@ -281,7 +281,7 @@ export default function Navbar() {
                           <Link
                             to="/support"
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-white/80 dark:hover:bg-earth-800/50 transition-colors select-none"
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-earth-100/50 dark:hover:bg-white/[0.04] transition-colors select-none"
                           >
                             <MessageSquare className="w-4 h-4 text-indigo-500" />
                             Help & Support
@@ -296,7 +296,7 @@ export default function Navbar() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50/80 dark:hover:bg-red-950/30 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50/80 dark:hover:bg-red-500/[0.05] transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
                         Sign out
@@ -374,7 +374,7 @@ export default function Navbar() {
                         className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all duration-300 select-none ${
                           isActive
                             ? 'bg-white dark:bg-earth-800 text-gold-600 dark:text-gold-400 shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-earth-200/60 dark:border-earth-700/50'
-                            : 'text-earth-800 dark:text-earth-200 hover:bg-white/60 dark:hover:bg-earth-800/50'
+                            : 'text-earth-800 dark:text-earth-200 hover:bg-earth-100/50 dark:hover:bg-white/[0.04]'
                         }`}
                       >
                         <link.icon className={`w-5 h-5 ${isActive ? 'text-gold-500' : ''}`} />
@@ -409,7 +409,7 @@ export default function Navbar() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleLogout}
-                  className="flex items-center gap-2 text-sm font-bold text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl hover:bg-red-50/80 dark:hover:bg-red-950/30 transition-colors"
+                  className="flex items-center gap-2 text-sm font-bold text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl hover:bg-red-50/80 dark:hover:bg-red-500/[0.05] transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign out
