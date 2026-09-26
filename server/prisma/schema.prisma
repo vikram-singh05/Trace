@@ -63,6 +63,27 @@ enum TicketStatus {
   RESOLVED
 }
 
+enum FeedbackType {
+  BUG
+  PROBLEM
+  FEEDBACK
+  FEATURE_REQUEST
+}
+
+enum FeedbackStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum FeedbackSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
 // ─────────────────────────────────────────────────────────────────
 //  MODELS
 // ─────────────────────────────────────────────────────────────────
@@ -94,6 +115,7 @@ model User {
   reportsSubmitted UserReport[] @relation("ReportedBy")
   reportsReceived  UserReport[] @relation("ReportedUser")
   supportTickets   SupportTicket[]
+  feedbackReports  FeedbackReport[] @relation("FeedbackReporter")
 
   @@map("users")
 }
@@ -136,6 +158,7 @@ model Item {
   verificationQuestions VerificationQuestion[]
   lostMatches           Match[]                @relation("LostItem")
   foundMatches          Match[]                @relation("FoundItem")
+  feedbackReports       FeedbackReport[]       @relation("ReportedItem")
 
   // Indexes — covering the most common API query patterns
   @@index([reporterId])           // "My reports" dashboard
@@ -356,4 +379,32 @@ model SupportTicket {
   @@index([status])
   @@index([userId])
   @@map("support_tickets")
+}
+
+model FeedbackReport {
+  id             String           @id @default(cuid())
+  type           FeedbackType
+  category       String?
+  title          String
+  description    String
+  severity       FeedbackSeverity?
+  status         FeedbackStatus   @default(OPEN)
+  screenshotUrl  String?
+  pageUrl        String?
+  route          String?
+  adminNote      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  userId         String?
+  itemId         String?
+
+  user           User?            @relation("FeedbackReporter", fields: [userId], references: [id], onDelete: SetNull)
+  item           Item?            @relation("ReportedItem", fields: [itemId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([type])
+  @@index([userId])
+  @@index([itemId])
+  @@map("feedback_reports")
 }

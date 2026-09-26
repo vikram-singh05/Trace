@@ -18,6 +18,7 @@ const EditItem      = lazy(() => import('../pages/items/EditItem'));
 const BrowseItems   = lazy(() => import('../pages/items/BrowseItems'));
 const MyReports     = lazy(() => import('../pages/dashboard/MyReports'));
 const MyClaims      = lazy(() => import('../pages/dashboard/MyClaims'));
+const MyFeedback    = lazy(() => import('../pages/dashboard/MyFeedback'));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
 const Messages      = lazy(() => import('../pages/chat/Messages'));
 
@@ -95,6 +96,7 @@ export default function AppRouter() {
             <Route path="/items/:id/edit" element={<EditItem />} />
             <Route path="/my-reports" element={<MyReports />} />
             <Route path="/my-claims"  element={<MyClaims />} />
+            <Route path="/my-feedback" element={<MyFeedback />} />
             <Route path="/messages"   element={<Messages />} />
           </Route>
         </Route>

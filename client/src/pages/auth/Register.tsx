@@ -105,20 +105,9 @@ export default function Register() {
       <div className="relative z-10 w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/20 dark:border-white/10 bg-white/40 dark:bg-earth-900/40 backdrop-blur-3xl backdrop-saturate-150">
         
         {/* ── Left Side: Branding ── */}
-        <div className="hidden lg:flex lg:w-[45%] relative flex-col justify-end p-12 overflow-hidden border-r border-white/20 dark:border-white/5">
-          {/* Ambient Background Image */}
-          <div className="absolute inset-0 bg-earth-950">
-            <img 
-              src="/trace_logo.jpg" 
-              className="w-full h-full object-cover scale-110 origin-center opacity-40 blur-[2px] transition-transform duration-[15000ms] hover:scale-125" 
-              alt="Trace Ambient Background"
-            />
-          </div>
-          {/* Multi-layered gradient for depth and perfect readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-earth-950 via-earth-950/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-earth-950/80 via-transparent to-transparent" />
+        <div className="hidden lg:flex lg:w-[45%] relative flex-col justify-end p-12 overflow-hidden border-r border-white/20 dark:border-white/5 bg-earth-900/5 dark:bg-earth-900/30">
           
-          <div className="relative z-10 space-y-6 text-left p-10 rounded-[2rem] bg-white/5 dark:bg-earth-900/30 backdrop-blur-xl border border-white/10 dark:border-white/5 shadow-2xl">
+          <div className="relative z-10 space-y-6 text-left p-10 rounded-[2rem] bg-white/50 dark:bg-earth-900/30 backdrop-blur-xl border border-white/10 dark:border-white/5 shadow-2xl">
             <Link to="/" className="inline-flex items-center gap-4 group mb-2">
               <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white/10 shadow-lg group-hover:scale-105 transition-transform">
                 <img src="/trace_logo.jpg" alt="Logo" className="w-full h-full object-cover scale-110" />

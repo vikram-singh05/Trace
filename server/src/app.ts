@@ -67,6 +67,7 @@ import chatRouter from './routes/chat.routes';
 import reportRouter from './routes/report.routes';
 import uploadRouter from './routes/upload.routes';
 import supportRouter from './routes/support.routes';
+import feedbackRouter from './routes/feedback.routes';
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/items', itemRouter);
@@ -78,6 +79,7 @@ app.use('/api/v1/chat', chatRouter);
 app.use('/api/v1/reports', reportRouter);
 app.use('/api/v1/upload', uploadRouter);
 app.use('/api/v1/support', supportRouter);
+app.use('/api/v1/feedback', feedbackRouter);
 
 // Future routes — uncommented as each phase is completed:
 // app.use('/api/v1/users',         usersRouter);

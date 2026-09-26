@@ -2,16 +2,17 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '../../api/adminApi';
 import { reportApi, type UserReport } from '../../api/reportApi';
+import { feedbackApi } from '../../api/feedbackApi';
 import type { User } from '../../api/adminApi';
 import type { Item } from '../../api/itemApi';
-import { Users, ShieldAlert, Activity, Search, Ban, CheckCircle2, Trash2, RotateCcw, Shield, MapPin, Sparkles, BarChart2, X, MessageSquare } from 'lucide-react';
+import { Users, Activity, Search, Ban, CheckCircle2, Trash2, RotateCcw, Shield, MapPin, Sparkles, BarChart2, X, MessageSquare } from 'lucide-react';
 import AnimatedCount from '../../components/ui/AnimatedCount';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import AdminChatLogModal from '../../components/admin/AdminChatLogModal';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'USERS' | 'ITEMS' | 'REPORTS' | 'SUPPORT'>('OVERVIEW');
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'USERS' | 'ITEMS' | 'REPORTS' | 'SUPPORT' | 'FEEDBACK'>('OVERVIEW');
 
   return (
     <div className="relative p-4 sm:p-8 pt-6 sm:pt-10">
@@ -41,7 +42,7 @@ export default function AdminDashboard() {
 
         {/* Tab Switcher Pills */}
         <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-earth-100/70 dark:bg-white/[0.04] border border-earth-200/80 dark:border-white/10 backdrop-blur-xl w-fit shadow-inner overflow-x-auto max-w-full">
-          {(['OVERVIEW', 'USERS', 'ITEMS', 'REPORTS', 'SUPPORT'] as const).map((tab) => (
+          {(['OVERVIEW', 'USERS', 'ITEMS', 'REPORTS', 'SUPPORT', 'FEEDBACK'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -50,7 +51,7 @@ export default function AdminDashboard() {
                   : 'text-earth-600 dark:text-earth-300 hover:text-earth-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/[0.08]'
                 }`}
             >
-              {tab === 'OVERVIEW' ? 'Live Overview & Analytics' : tab === 'USERS' ? 'User Directory' : tab === 'ITEMS' ? 'Item Moderation' : tab === 'REPORTS' ? 'User Reports' : 'Support Tickets'}
+              {tab === 'OVERVIEW' ? 'Live Overview & Analytics' : tab === 'USERS' ? 'User Directory' : tab === 'ITEMS' ? 'Item Moderation' : tab === 'REPORTS' ? 'User Reports' : tab === 'SUPPORT' ? 'Support Tickets' : 'Feedback & Bugs'}
             </button>
           ))}
         </div>
@@ -60,6 +61,7 @@ export default function AdminDashboard() {
         {activeTab === 'ITEMS' && <ItemsTab />}
         {activeTab === 'REPORTS' && <ReportsTab />}
         {activeTab === 'SUPPORT' && <SupportTab />}
+        {activeTab === 'FEEDBACK' && <FeedbackTab />}
       </div>
     </div>
   );
@@ -707,5 +709,118 @@ function ResolveTicketModal({
         </form>
       </div>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Feedback Tab
+// ─────────────────────────────────────────────────────────────────
+function FeedbackTab() {
+  const queryClient = useQueryClient();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['adminFeedbacks'],
+    queryFn: () => feedbackApi.getAllFeedbacks(),
+  });
+
+  const updateStatus = useMutation({
+    mutationFn: ({ id, status, adminNote }: { id: string; status: string; adminNote?: string }) =>
+      feedbackApi.updateStatus(id, status, adminNote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminFeedbacks'] });
+    },
+  });
+
+  if (isLoading) return <div className="text-center p-12 text-earth-500">Loading feedbacks...</div>;
+  if (!data?.data?.feedbacks?.length) return <div className="text-center p-12 text-earth-500">No feedbacks found.</div>;
+
+  return (
+    <>
+    <div className="card-feature p-0 overflow-hidden shadow-2xl animate-fade-up border border-white/20 dark:border-white/5">
+      <div className="p-6 border-b border-earth-200/50 dark:border-white/5 flex items-center justify-between bg-white/40 dark:bg-earth-900/40">
+        <h3 className="text-lg font-bold text-earth-900 dark:text-white flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-gold-500" />
+          Feedback & Bug Reports
+        </h3>
+      </div>
+      
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm whitespace-nowrap">
+          <thead className="bg-earth-50/50 dark:bg-earth-900/50 text-earth-500 dark:text-earth-400 text-xs uppercase tracking-wider font-extrabold">
+            <tr>
+              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">Type/Severity</th>
+              <th className="px-6 py-4">User</th>
+              <th className="px-6 py-4">Report Details</th>
+              <th className="px-6 py-4">Context</th>
+              <th className="px-6 py-4">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-earth-200/50 dark:divide-white/5 text-earth-600 dark:text-earth-300">
+            {data.data.feedbacks.map((item: any) => (
+              <tr key={item.id} className="hover:bg-earth-50/50 dark:hover:bg-earth-800/30 transition-colors">
+                <td className="px-6 py-4">
+                  <select
+                    value={item.status}
+                    onChange={(e) => updateStatus.mutate({ id: item.id, status: e.target.value })}
+                    className={`text-xs font-bold rounded-lg px-3 py-1.5 border outline-none cursor-pointer transition-colors ${
+                      item.status === 'OPEN' ? 'bg-red-500/10 text-red-600 border-red-500/20' :
+                      item.status === 'IN_PROGRESS' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' :
+                      'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                    }`}
+                  >
+                    <option value="OPEN">OPEN</option>
+                    <option value="IN_PROGRESS">IN PROGRESS</option>
+                    <option value="RESOLVED">RESOLVED</option>
+                    <option value="CLOSED">CLOSED</option>
+                  </select>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="font-bold text-earth-900 dark:text-white">{item.type}</div>
+                  {item.severity && <div className="text-[10px] text-red-500 font-bold uppercase mt-1">{item.severity} SEVERITY</div>}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="font-bold text-earth-900 dark:text-white">{item.user?.name || 'Guest'}</div>
+                  <div className="text-xs text-earth-500">{item.user?.email || 'N/A'}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-normal max-w-xs">
+                  <div className="font-bold text-earth-900 dark:text-white line-clamp-1">{item.title}</div>
+                  <div className="text-xs mt-1 text-earth-500 line-clamp-2">{item.description}</div>
+                  {item.screenshotUrl && (
+                    <button 
+                      onClick={() => setSelectedImage(item.screenshotUrl)}
+                      className="text-xs font-bold text-gold-500 hover:underline mt-2 inline-block"
+                    >
+                      View Screenshot
+                    </button>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-normal">
+                  {item.itemId && <div className="text-xs font-mono mb-1"><span className="opacity-50">Item:</span> {item.itemId}</div>}
+                  {item.route && <div className="text-[10px] bg-earth-100 dark:bg-earth-800 px-2 py-1 rounded inline-block text-earth-600 dark:text-earth-300 font-mono">{item.route}</div>}
+                </td>
+                <td className="px-6 py-4 text-xs font-medium">
+                  {new Date(item.createdAt).toLocaleDateString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {selectedImage && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedImage(null)} />
+        <div className="relative bg-white dark:bg-earth-900 rounded-3xl p-2 shadow-2xl max-w-4xl max-h-[90vh] overflow-hidden">
+          <button onClick={() => setSelectedImage(null)} className="absolute top-4 right-4 bg-black/50 p-2 rounded-full text-white hover:bg-red-500">
+            <X className="w-5 h-5" />
+          </button>
+          <img src={selectedImage} alt="Feedback Screenshot" className="max-h-[85vh] w-auto rounded-2xl object-contain" />
+        </div>
+      </div>
+    )}
+    </>
   );
 }

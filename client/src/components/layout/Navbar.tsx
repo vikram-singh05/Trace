@@ -267,6 +267,26 @@ export default function Navbar() {
                             Dashboard
                           </Link>
                         </motion.div>
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Link
+                            to="/my-feedback"
+                            onClick={() => setIsProfileOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-white/80 dark:hover:bg-earth-800/50 transition-colors select-none"
+                          >
+                            <FileText className="w-4 h-4 text-earth-500" />
+                            My Feedback History
+                          </Link>
+                        </motion.div>
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Link
+                            to="/support"
+                            onClick={() => setIsProfileOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-earth-700 dark:text-earth-200 hover:bg-white/80 dark:hover:bg-earth-800/50 transition-colors select-none"
+                          >
+                            <MessageSquare className="w-4 h-4 text-indigo-500" />
+                            Help & Support
+                          </Link>
+                        </motion.div>
                       </motion.div>
 
                       <div className="divider my-2 opacity-50" />

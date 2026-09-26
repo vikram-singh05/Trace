@@ -93,13 +93,22 @@ export default function ItemDetail() {
       <div className="max-w-5xl mx-auto animate-fade-up">
         <div className="flex items-center justify-between mb-6">
           <BackButton />
-          <button
-            onClick={handleShare}
-            className="btn-secondary text-xs py-2 px-3 flex items-center gap-1.5 shadow-sm"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            {copied ? 'Link Copied!' : 'Share Listing'}
-          </button>
+          <div className="flex gap-2">
+            <Link
+              to={`/support?itemId=${item.id}`}
+              className="btn-secondary text-xs py-2 px-3 flex items-center gap-1.5 shadow-sm bg-red-50/50 hover:bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 border-red-200 dark:border-red-800/30"
+            >
+              <AlertCircle className="w-3.5 h-3.5" />
+              Report Problem
+            </Link>
+            <button
+              onClick={handleShare}
+              className="btn-secondary text-xs py-2 px-3 flex items-center gap-1.5 shadow-sm"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              {copied ? 'Link Copied!' : 'Share Listing'}
+            </button>
+          </div>
         </div>
 
         <div className="card-feature overflow-hidden shadow-2xl">
